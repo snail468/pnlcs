@@ -256,7 +256,8 @@ while [ $COUNT -lt $MAX_WAIT ]; do
     DB_STATUS=$(docker inspect --format='{{json .State.Health.Status}}' pnlcs-db 2>/dev/null || echo "\"starting\"")
     APP_STATUS=$(docker inspect --format='{{json .State.Status}}' pnlcs 2>/dev/null || echo "\"starting\"")
     
-    if [ "$DB_STATUS" = "\"healthy\"" ] && [ "$APP_STATUS" = "\"running\"" ]; then
+    if ([ "$DB_STATUS" = "\"healthy\"" ] || docker exec pnlcs-db mariadb-admin ping --silent 2>/dev/null || docker exec pnlcs-db mariadb -u pnlcs -p"${RANDOM_DB_PASS}" -e "SELECT 1" >/dev/null 2>&1) && [ "$APP_STATUS" = "\"running\"" ]; then
+        echo -e "${GREEN}      ✓ 数据库与核心应用全部就绪！${NC}"
         break
     fi
     sleep 2
