@@ -246,10 +246,11 @@ fi
 # ------------------------------------------------------------------------------
 echo -e "${BLUE}[5/6] 启动 Docker 容器集群...${NC}"
 $COMPOSE_CMD down 2>/dev/null || true
+docker network rm pnlcs-net 2>/dev/null || true
 $COMPOSE_CMD up -d
 
 echo -e "${BLUE}[6/6] 等待数据库与服务健康检查就绪...${NC}"
-MAX_WAIT=40
+MAX_WAIT=60
 COUNT=0
 while [ $COUNT -lt $MAX_WAIT ]; do
     DB_STATUS=$(docker inspect --format='{{json .State.Health.Status}}' pnlcs-db 2>/dev/null || echo "\"starting\"")
