@@ -91,7 +91,7 @@ generate_random_secret() {
     LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c "$length"
 }
 
-# 生成强随机密钥
+# 预先生成强随机密钥 (若服务器已存在 .env 则复用已有密码，避免数据卷持久化后密码不一致)
 RANDOM_DB_PASS=$(generate_random_secret 24)
 RANDOM_ROOT_PASS=$(generate_random_secret 24)
 RANDOM_REDIS_PASS=$(generate_random_secret 24)
@@ -99,16 +99,26 @@ RANDOM_REDIS_PASS=$(generate_random_secret 24)
 # 生成合法的 Laravel APP_KEY (32 字节 Base64 随机密钥)
 RANDOM_APP_KEY="base64:$(head -c 32 /dev/urandom | base64 | tr -d '\n\r')"
 
-# 检测服务器公网或局域网 IP
+ENV_FILE=".env"
+if [ -f "$ENV_FILE" ]; then
+    echo -e "      检测到已存在 .env，正在读取已有密钥以保持与持久化数据卷一致..."
+    EXISTING_APP_KEY=$(grep '^APP_KEY=' "$ENV_FILE" | head -n1 | cut -d '=' -f2- | tr -d '"\r\n ')
+    EXISTING_DB_PASS=$(grep '^DB_PASSWORD=' "$ENV_FILE" | head -n1 | cut -d '=' -f2- | tr -d '"\r\n ')
+    EXISTING_ROOT_PASS=$(grep '^DB_ROOT_PASSWORD=' "$ENV_FILE" | head -n1 | cut -d '=' -f2- | tr -d '"\r\n ')
+    EXISTING_REDIS_PASS=$(grep '^REDIS_PASSWORD=' "$ENV_FILE" | head -n1 | cut -d '=' -f2- | tr -d '"\r\n ')
+    
+    [ -n "$EXISTING_APP_KEY" ] && RANDOM_APP_KEY="$EXISTING_APP_KEY"
+    [ -n "$EXISTING_DB_PASS" ] && RANDOM_DB_PASS="$EXISTING_DB_PASS"
+    [ -n "$EXISTING_ROOT_PASS" ] && RANDOM_ROOT_PASS="$EXISTING_ROOT_PASS"
+    [ -n "$EXISTING_REDIS_PASS" ] && RANDOM_REDIS_PASS="$EXISTING_REDIS_PASS"
+    
+    cp "$ENV_FILE" "${ENV_FILE}.backup.$(date +%Y%m%d%H%M%S)"
+fi
+
+# 检测服务器公网或局域网 IP 与端口
 DETECTED_IP=$(curl -s4m 3 https://api.ipify.org || curl -s4m 3 https://ifconfig.me || hostname -I | awk '{print $1}' || echo "127.0.0.1")
 APP_PORT="${APP_PORT:-8090}"
 APP_URL="http://${DETECTED_IP}:${APP_PORT}"
-
-ENV_FILE=".env"
-if [ -f "$ENV_FILE" ]; then
-    echo -e "      检测到已存在 .env，正在备份为 .env.backup..."
-    cp "$ENV_FILE" "${ENV_FILE}.backup.$(date +%Y%m%d%H%M%S)"
-fi
 
 echo -e "      生成全新的 .env 配置文件..."
 cat <<EOF > "$ENV_FILE"
@@ -256,6 +266,10 @@ echo ""
 # 清除一次 Laravel 内部缓存并重载 Nginx，确保新配置立即刷新生效
 docker exec pnlcs php artisan optimize:clear > /dev/null 2>&1 || true
 docker exec pnlcs nginx -s reload > /dev/null 2>&1 || true
+
+# 强制同步 MariaDB 业务用户密码，确保与当前 .env 保持 100% 绝对一致（消除旧数据卷残留密码不一致问题）
+docker exec pnlcs-db mariadb -e "ALTER USER 'pnlcs'@'%' IDENTIFIED BY '${RANDOM_DB_PASS}'; FLUSH PRIVILEGES;" > /dev/null 2>&1 || \
+docker exec pnlcs-db mariadb -uroot -p"${RANDOM_ROOT_PASS}" -e "ALTER USER 'pnlcs'@'%' IDENTIFIED BY '${RANDOM_DB_PASS}'; FLUSH PRIVILEGES;" > /dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
 # 7. 输出部署报告与安装指引

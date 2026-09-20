@@ -87,6 +87,7 @@ class InstallController extends Controller
             'port' => config('database.connections.mysql.port', '3306'),
             'database' => config('database.connections.mysql.database', 'pnlcs'),
             'username' => config('database.connections.mysql.username', 'pnlcs'),
+            'password' => config('database.connections.mysql.password', ''),
         ]);
     }
 

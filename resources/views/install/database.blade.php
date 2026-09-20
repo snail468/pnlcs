@@ -29,7 +29,7 @@
             </div>
             <div>
                 <label class="text-sm font-medium text-slate-700">数据库密码 (Password)</label>
-                <input type="password" name="password" value="{{ old('password') }}" class="mt-1 w-full px-3 py-2 border border-slate-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500">
+                <input type="password" name="password" value="{{ old('password', $password ?? '') }}" class="mt-1 w-full px-3 py-2 border border-slate-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
         </div>
 
