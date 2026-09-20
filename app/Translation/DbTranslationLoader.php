@@ -30,17 +30,25 @@ class DbTranslationLoader extends FileLoader
         // row on every group load would undo the point of caching.
         $stamp = $this->fileStamp($locale, $group);
 
-        $cached = Cache::get($cacheKey);
-        if (is_array($cached)
-            && array_key_exists('lines', $cached)
-            && is_array($cached['lines'])
-            && ($cached['stamp'] ?? null) === $stamp) {
-            return $cached['lines'];
+        try {
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached)
+                && array_key_exists('lines', $cached)
+                && is_array($cached['lines'])
+                && ($cached['stamp'] ?? null) === $stamp) {
+                return $cached['lines'];
+            }
+        } catch (\Throwable) {
+            // Cache temporarily unreachable (e.g. fresh install pre-configuration)
         }
 
         $lines = $this->merged($locale, $group, $namespace);
 
-        Cache::put($cacheKey, ['stamp' => $stamp, 'lines' => $lines], self::TTL);
+        try {
+            Cache::put($cacheKey, ['stamp' => $stamp, 'lines' => $lines], self::TTL);
+        } catch (\Throwable) {
+            // Cache temporarily unreachable
+        }
 
         return $lines;
     }

@@ -71,7 +71,29 @@
 
 ---
 
-### 📦 生产级快速部署教程（方案一：独立本地构建与启动）
+### ⚡ 极速全自动一键部署（强烈推荐，AMD64 & ARM64 通用）
+
+本项目自带全自动化部署脚本 `deploy.sh`，**所有敏感参数（APP_KEY、数据库密码、Redis 密码等）全自动高强度随机生成**，自动适配 CPU 架构，自动配置环境与权限，优先拉取 GitHub Actions 预构建的多架构镜像（或本地构建回退），1 秒即可搞定部署：
+
+```bash
+# 1. 克隆本项目仓库
+git clone https://github.com/snail468/pnlcs.git
+cd pnlcs
+
+# 2. 赋予执行权限并一键启动
+chmod +x deploy.sh
+./deploy.sh
+```
+
+> **自动化特性**：
+> 1. **全架构智能识别**：自动判断 AMD64 (x86_64) 或 ARM64 (aarch64)；若在小内存 ARM 机器上自动创建 2G Swap 分区防 OOM；
+> 2. **参数全随机安全生成**：生成 32 字节 Laravel Base64 `APP_KEY`，生成 24 位随机数据库及 Redis 密码并自动写入 `.env`，同时保存在 `deploy-credentials.txt` 便于日后查阅；
+> 3. **零依赖安全安装**：默认配置 `SESSION_DRIVER=file` 与 `CACHE_STORE=file`，彻底解决初始化安装时的 500 报错与 Redis 依赖阻断；
+> 4. **自动健康检查**：容器启动后自动等待 MariaDB 初始化并进行健康检测，最后输出全中文的安装向导链接。
+
+---
+
+### 📦 手动部署教程（方案一：逐步构建与启动）
 
 > **为什么推荐方案一？**  
 > 官方镜像在启动时会在容器内执行 `git clone`，极易因网络环境导致拉取缓慢，且与挂载卷冲突易抛出 `destination path already exists` 报错（退出码 128）。  
