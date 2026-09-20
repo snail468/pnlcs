@@ -37,13 +37,28 @@ update_env_var "APP_FALLBACK_LOCALE" "${APP_FALLBACK_LOCALE:-zh}"
 update_env_var "REDIS_HOST" "$REDIS_HOST"
 update_env_var "REDIS_PORT" "$REDIS_PORT"
 update_env_var "REDIS_PASSWORD" "$REDIS_PASSWORD"
-update_env_var "CACHE_STORE" "${CACHE_STORE:-redis}"
-update_env_var "SESSION_DRIVER" "${SESSION_DRIVER:-redis}"
+update_env_var "CACHE_STORE" "${CACHE_STORE:-file}"
+update_env_var "SESSION_DRIVER" "${SESSION_DRIVER:-file}"
 
-# 3. 检查并生成 APP_KEY (若尚未配置)
+# 3. 检查并生成 APP_KEY (确保应用加密密钥就绪)
+if [ -n "$APP_KEY" ] && [ "$APP_KEY" != '""' ]; then
+    update_env_var "APP_KEY" "$APP_KEY"
+fi
+
 if ! grep -q "^APP_KEY=base64:" "$APP_DIR/.env"; then
     echo ">> Generating Laravel APP_KEY..."
     php artisan key:generate --force || true
+fi
+
+# 提取当前有效的 APP_KEY 并强制注入 PHP-FPM 配置池 (彻底规避 Docker 注入空 APP_KEY 覆盖 .env 导致的 500 报错)
+CURRENT_KEY=$(grep "^APP_KEY=" "$APP_DIR/.env" | cut -d '=' -f2- || true)
+if [ -n "$CURRENT_KEY" ]; then
+    export APP_KEY="$CURRENT_KEY"
+    mkdir -p /usr/local/etc/php-fpm.d
+    cat <<EOF > /usr/local/etc/php-fpm.d/zz-appkey.conf
+[www]
+env[APP_KEY] = '$CURRENT_KEY'
+EOF
 fi
 
 # 4. 修复 storage 与 cache 目录权限

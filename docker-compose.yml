@@ -40,11 +40,14 @@ services:
       # 应用外部访问基础 URL（务必与实际浏览器访问地址一致，例如带端口或域名）
       APP_URL: ${APP_URL:-http://localhost:8090}
       # 默认系统语言与后备语言：设为 zh（简体中文）
+      # 默认系统语言与后备语言：设为 zh（简体中文）
       APP_LOCALE: ${APP_LOCALE:-zh}
       APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-zh}
-      # 缓存与会话存储引擎：推荐使用 redis 提高性能，也可使用 file
-      CACHE_STORE: ${CACHE_STORE:-redis}
-      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      # 应用密钥（若未生成，容器启动脚本将自动生成并生效）
+      APP_KEY: ${APP_KEY:-}
+      # 缓存与会话存储引擎：初始化安装阶段推荐使用 file 确保零依赖极速就绪，系统跑通后可随时改为 redis
+      CACHE_STORE: ${CACHE_STORE:-file}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
       QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
       # Redis 内存数据库连接信息
       REDIS_HOST: redis
@@ -114,7 +117,7 @@ services:
         if [ -n "$$REDIS_PASSWORD" ]; then
           redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes
         else
-          redis-server --appendonly yes
+          redis-server --protected-mode no --appendonly yes
         fi
       '
     environment:
