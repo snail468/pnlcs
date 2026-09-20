@@ -1,0 +1,148 @@
+# ==============================================================================
+# PNLCS (Panelica License & Customer System) 官方推荐标准 Docker Compose 编排模板
+#
+# 使用指南：
+# 1. 复制同目录下的 .env.docker.example 为 .env 文件：cp .env.docker.example .env
+# 2. 根据实际情况修改 .env 中的关键变量（例如：APP_URL、DB_PASSWORD、DB_ROOT_PASSWORD 等）
+# 3. 启动所有容器服务：docker compose up -d
+# 4. 首次启动请等待 2~3 分钟（容器自动拉取代码并初始化依赖），随后访问：http://你的服务器IP:8090/install
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # PNLCS 核心 Web 应用程序服务
+  # ----------------------------------------------------------------------------
+  app:
+    container_name: pnlcs
+    # 镜像标签名称：
+    # 说明：官方 panelica/pnlcs-runtime:1.4 仅提供 amd64 镜像。
+    # 在 ARM64 服务器（如 Apple Silicon、甲骨文 ARM、AWS Graviton、树莓派等）上部署时，
+    # 只要运行 docker compose up -d --build，即可通过下方 build 配置在服务器上以 100% 原生性能极速构建并启动！
+    image: pnlcs:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    # 外部网络端口映射：格式为 [宿主机对外访问端口]:[容器内服务端口(80)]
+    ports:
+      - "${APP_PORT:-8090}:80"
+    # 加载环境变量配置文件
+    env_file:
+      - .env
+    # 核心环境变量设置（覆盖与补充容器内默认配置）
+    environment:
+      # 数据库连接设定：指向内部容器名 db
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-pnlcs}
+      DB_USERNAME: ${DB_USERNAME:-pnlcs}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      # 应用外部访问基础 URL（务必与实际浏览器访问地址一致，例如带端口或域名）
+      APP_URL: ${APP_URL:-http://localhost:8090}
+      # 默认系统语言与后备语言：设为 zh（简体中文）
+      APP_LOCALE: ${APP_LOCALE:-zh}
+      APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-zh}
+      # 缓存与会话存储引擎：推荐使用 redis 提高性能，也可使用 file
+      CACHE_STORE: ${CACHE_STORE:-redis}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+      # Redis 内存数据库连接信息
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    # 数据持久化挂载
+    volumes:
+      # 1. 持久化存储应用目录（包含工单附件、上传的Logo/图标、备份文件、日志以及安装锁定标记 installed.lock）
+      - pnlcs-storage:/var/www/pnlcs/storage
+      # 2. 挂载本地最新深度汉化语言包（确保中文本地化立即生效且支持热更新）
+      - ./lang/zh:/var/www/pnlcs/lang/zh:ro
+      - ./lang/zh.json:/var/www/pnlcs/lang/zh.json:ro
+      # 若需挂载整套本地源码进行二次开发调试，可取消下方注释：
+      # - ./:/var/www/pnlcs
+    # 依赖服务：确保数据库通过健康检查、Redis 启动完成后再启动 Web 容器
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - pnlcs-net
+
+  # ----------------------------------------------------------------------------
+  # MariaDB 11 关系型数据库服务 (兼容 MySQL 8.0)
+  # ----------------------------------------------------------------------------
+  db:
+    container_name: pnlcs-db
+    image: mariadb:11
+    restart: unless-stopped
+    # 优化字符集与排序规则，确保全中文环境及 Emoji 表情完全兼容无乱码
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      # MariaDB root 超级管理员密码（请在 .env 中设置复杂密码）
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      # 自动创建的业务数据库名称
+      MYSQL_DATABASE: ${DB_DATABASE:-pnlcs}
+      # 自动创建的业务数据库普通用户名
+      MYSQL_USER: ${DB_USERNAME:-pnlcs}
+      # 业务数据库用户的连接密码
+      MYSQL_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      # 数据库文件持久化挂载（容器重建数据不丢失）
+      - pnlcs-db-data:/var/lib/mysql
+    # 数据库存活与就绪状态健康检查
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} || healthcheck.sh --connect --innodb_initialized || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - pnlcs-net
+
+  # ----------------------------------------------------------------------------
+  # Redis 7 内存缓存与高速会话服务
+  # ----------------------------------------------------------------------------
+  redis:
+    container_name: pnlcs-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    # 根据环境变量决定是否开启密码保护
+    command: >
+      sh -c '
+        if [ -n "$$REDIS_PASSWORD" ]; then
+          redis-server --requirepass "$$REDIS_PASSWORD" --appendonly yes
+        else
+          redis-server --appendonly yes
+        fi
+      '
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    volumes:
+      # Redis AOF 数据持久化挂载
+      - pnlcs-redis-data:/data
+    networks:
+      - pnlcs-net
+
+# ------------------------------------------------------------------------------
+# 数据卷定义（持久化存储）
+# ------------------------------------------------------------------------------
+volumes:
+  # 应用持久化数据：用户上传凭据、发票、备份与日志
+  pnlcs-storage:
+    name: pnlcs-storage
+  # MariaDB 数据库底层持久化数据
+  pnlcs-db-data:
+    name: pnlcs-db-data
+  # Redis 缓存持久化数据
+  pnlcs-redis-data:
+    name: pnlcs-redis-data
+
+# ------------------------------------------------------------------------------
+# 内部桥接网络定义
+# ------------------------------------------------------------------------------
+networks:
+  pnlcs-net:
+    name: pnlcs-net
+    driver: bridge

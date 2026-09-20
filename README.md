@@ -52,6 +52,122 @@
 
 ---
 
+## 🇨🇳 简体中文与 Docker Compose 生产级部署（推荐方案一）
+
+本仓库为 **PNLCS** 的全功能增强与深度汉化版本，已完成**全系统 100% 简体中文（zh）本地化**，并提供**生产级 Docker Compose 编排模板与多架构原生 Dockerfile**。
+
+### 🌟 核心特性升级
+1. **彻底与深度的全系统汉化**：
+   - 包含后台管理、客户端面板、主机控制面板内嵌工具（文件管理器、域名DNS、邮箱、数据库、定时任务、备份等）。
+   - **安装向导全中文**：系统初始化的 6 大向导步骤（环境依赖、数据库连接、管理员配置、应用设置、安装完成）已 100% 中文化。
+   - 术语严格符合 IDC 主机销售与云计算行业惯例（如 *Affiliates -> 推介返利计划*、*Addons -> 附加增值服务*、*Whitelabel -> 白标定制与去版权*、*Service Suspension -> 逾期停机*、*Service Termination -> 超期销毁*）。
+2. **多架构生产级支持（AMD64 & ARM64）**：
+   - 解决官方镜像仅提供 x86_64 导致 ARM 架构无法运行的问题。
+   - 提供专属 `docker/Dockerfile` 与自动化初始化脚本，跨平台原生支持 **linux/amd64** 与 **linux/arm64**（Apple Silicon、AWS Graviton、甲骨文 ARM、华为云鲲鹏、树莓派等）。
+3. **开箱即用 Docker Compose**：
+   - 包含预配置优化参数的 **MariaDB 11**（全面支持 UTF8MB4 中文与 Emoji，修复 MySQL 8 原生密码兼容问题）。
+   - 集成 **Redis 7** 高速缓存与会话存储。
+   - 所有环境变量参数均配有详尽中文注释模板（见 `.env.docker.example`）。
+
+---
+
+### 📦 生产级快速部署教程（方案一：独立本地构建与启动）
+
+> **为什么推荐方案一？**  
+> 官方镜像在启动时会在容器内执行 `git clone`，极易因网络环境导致拉取缓慢，且与挂载卷冲突易抛出 `destination path already exists` 报错（退出码 128）。  
+> **方案一直接利用本地代码前台构建原生生产镜像**，打包全部中文语言包与编译产物，容器秒级启动，零网络依赖，数据持久化安全隔离！
+
+#### 步骤 1：克隆仓库并准备配置文件
+```bash
+# 克隆本项目仓库
+git clone git@github.com:snail468/pnlcs.git
+cd pnlcs
+
+# 复制带有全中文注释的 Docker 环境变量模板
+cp .env.docker.example .env
+
+# （可选）根据需要修改 .env 中的对外访问端口与数据库密码等
+nano .env   # 或使用 vi/vim
+```
+
+#### 步骤 2：针对不同服务器架构进行构建
+
+首先在服务器上查看当前 CPU 架构：
+```bash
+uname -m
+```
+
+##### 🟢 情况 A：如果您的服务器是 AMD64 (x86_64，即常见 Intel / AMD 云服务器)
+直接执行前台构建命令：
+```bash
+docker build -t pnlcs:latest -f docker/Dockerfile .
+```
+> 或者使用 Compose 构建：`docker compose build --progress=plain`
+
+---
+
+##### 🟠 情况 B：如果您的服务器是 ARM64 (aarch64，如甲骨文 ARM、AWS Graviton、苹果芯片等)
+在 ARM64 云服务器上编译 PHP 扩展和前端资产时，若服务器物理内存较小（如 1G 或 2G），建议先开启 2G 临时 Swap 交换空间，防止 Linux 内核 OOM 杀进程：
+```bash
+# 检查可用内存与 Swap
+free -m
+
+# 若可用内存低于 1.5G 且无 Swap，执行以下命令快速开启 2G Swap（推荐）：
+fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
+# 执行原生 ARM64 生产镜像构建
+docker build -t pnlcs:latest -f docker/Dockerfile .
+```
+
+---
+
+#### 步骤 3：一键后台启动容器集群
+镜像构建成功后，执行：
+```bash
+docker compose up -d
+```
+
+#### 步骤 4：检查服务状态
+```bash
+docker compose ps
+```
+当看到三个服务均正常运行（`pnlcs` 为 `Up`，`pnlcs-db` 为 `Up (healthy)`，`pnlcs-redis` 为 `Up`）时，即表示部署成功：
+```text
+NAME          IMAGE          COMMAND                  SERVICE   STATUS
+pnlcs         pnlcs:latest   "/usr/local/bin/dock…"   app       Up
+pnlcs-db      mariadb:11     "docker-entrypoint.s…"   db        Up (healthy)
+pnlcs-redis   redis:7-alpine "docker-entrypoint.s…"   redis     Up
+```
+
+#### 步骤 5：访问全中文安装向导
+在浏览器中打开：
+```text
+http://你的服务器IP:8090/install
+```
+进入安装向导，按照中文提示填写数据库连接与管理员账号即可完成初始化！
+* **数据库主机**：填写 `db`（对应容器内服务名）
+* **数据库端口**：`3306`
+* **数据库名称/用户名/密码**：对应 `.env` 中设置的值（默认均为 `pnlcs` / `changeme`）
+
+---
+
+### 🛠️ 常用运维管理命令
+
+| 操作 | 命令 | 说明 |
+| :--- | :--- | :--- |
+| **查看实时日志** | `docker compose logs -f app` | 实时查看 Web 服务运行日志 |
+| **查看数据库日志** | `docker compose logs -f db` | 查看 MariaDB 数据库日志 |
+| **重启容器集群** | `docker compose restart` | 平滑重启所有服务 |
+| **拉取更新并重新编译** | `git pull && docker build -t pnlcs:latest -f docker/Dockerfile . && docker compose up -d` | 升级应用版本 |
+| **进入应用容器终端** | `docker exec -it pnlcs bash` | 进入容器执行维护命令 |
+| **停止并退出** | `docker compose down` | 停止并移除容器（持久化数据保留） |
+| **完全销毁数据卷** | `docker compose down -v` | 停止容器并删除数据库数据卷（慎用） |
+
+---
+
 ## About — Open-Source WHMCS Alternative
 
 **PNLCS** is a free, open-source, self-hosted **hosting billing platform**

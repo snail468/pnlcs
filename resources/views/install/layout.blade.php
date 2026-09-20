@@ -4,28 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Install') — PNLCS</title>
+    <title>@yield('title', '安装向导') — PNLCS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+        body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10 px-4">
     <div class="max-w-3xl mx-auto">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-900">PNLCS Install Wizard</h1>
-            <p class="text-slate-600 mt-2">Open-source hosting billing platform</p>
+            <h1 class="text-3xl font-bold text-slate-900">PNLCS 安装向导</h1>
+            <p class="text-slate-600 mt-2">开源虚拟主机与云计算财务管理系统 · WHMCS 开源替代方案</p>
         </div>
 
-        <!-- Steps -->
+        <!-- 步骤导航条 -->
         <ol class="flex items-center justify-between mb-8 max-w-xl mx-auto">
             @php
                 $steps = [
-                    ['key' => 'requirements', 'label' => 'Requirements'],
-                    ['key' => 'database',     'label' => 'Database'],
-                    ['key' => 'admin',        'label' => 'Admin'],
-                    ['key' => 'app',          'label' => 'App'],
-                    ['key' => 'finish',       'label' => 'Finish'],
+                    ['key' => 'requirements', 'label' => '环境检测'],
+                    ['key' => 'database',     'label' => '数据库配置'],
+                    ['key' => 'admin',        'label' => '管理员账户'],
+                    ['key' => 'app',          'label' => '系统设置'],
+                    ['key' => 'finish',       'label' => '完成安装'],
                 ];
                 $current = $step ?? 'requirements';
                 $currentIdx = collect($steps)->search(fn($s) => $s['key'] === $current);
@@ -65,9 +65,9 @@
         </div>
 
         <p class="text-center text-xs text-slate-400 mt-6">
-            <a href="https://github.com/Panelica/pnlcs" class="hover:text-slate-600">github.com/Panelica/pnlcs</a>
+            <a href="https://github.com/Panelica/pnlcs" target="_blank" class="hover:text-slate-600">github.com/Panelica/pnlcs</a>
             ·
-            <a href="https://hub.docker.com/r/panelica/pnlcs-runtime" class="hover:text-slate-600">Docker Hub</a>
+            <a href="https://hub.docker.com/r/panelica/pnlcs-runtime" target="_blank" class="hover:text-slate-600">Docker Hub</a>
         </p>
     </div>
 </body>
