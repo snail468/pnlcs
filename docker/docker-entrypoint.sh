@@ -70,8 +70,9 @@ mkdir -p "$APP_DIR/storage/framework/cache" \
          "$APP_DIR/storage/app/private" \
          "$APP_DIR/bootstrap/cache"
 
-chown -R www-data:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chown -R www-data:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/.env" 2>/dev/null || true
 chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chmod 666 "$APP_DIR/.env" 2>/dev/null || true
 
 # 5. 创建 storage 软链接 (若尚未创建)
 if [ ! -L "$APP_DIR/public/storage" ]; then

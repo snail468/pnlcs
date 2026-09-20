@@ -125,33 +125,37 @@ class InstallController extends Controller
             'password' => 'nullable|string|max:255',
         ]);
 
-        $this->writeEnv([
-            'DB_CONNECTION' => 'mysql',
-            'DB_HOST' => $data['host'],
-            'DB_PORT' => (string) $data['port'],
-            'DB_DATABASE' => $data['database'],
-            'DB_USERNAME' => $data['username'],
-            'DB_PASSWORD' => $data['password'] ?? '',
-        ]);
-
-        // Reload config + reset connection so artisan migrate uses new creds.
-        Artisan::call('config:clear');
-        DB::purge('mysql');
-        config([
-            'database.connections.mysql.host' => $data['host'],
-            'database.connections.mysql.port' => (int) $data['port'],
-            'database.connections.mysql.database' => $data['database'],
-            'database.connections.mysql.username' => $data['username'],
-            'database.connections.mysql.password' => $data['password'] ?? '',
-        ]);
-
         try {
-            Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
-        } catch (\Throwable $e) {
-            return back()->withInput()->withErrors(['migrate' => 'Migration failed: '.$e->getMessage()]);
-        }
+            $this->writeEnv([
+                'DB_CONNECTION' => 'mysql',
+                'DB_HOST' => $data['host'],
+                'DB_PORT' => (string) $data['port'],
+                'DB_DATABASE' => $data['database'],
+                'DB_USERNAME' => $data['username'],
+                'DB_PASSWORD' => $data['password'] ?? '',
+            ]);
 
-        return redirect($request->getSchemeAndHttpHost().'/install/admin');
+            // Reload config + reset connection so artisan migrate uses new creds.
+            try {
+                Artisan::call('config:clear');
+            } catch (\Throwable $e) {}
+
+            DB::purge('mysql');
+            config([
+                'database.connections.mysql.host' => $data['host'],
+                'database.connections.mysql.port' => (int) $data['port'],
+                'database.connections.mysql.database' => $data['database'],
+                'database.connections.mysql.username' => $data['username'],
+                'database.connections.mysql.password' => $data['password'] ?? '',
+            ]);
+
+            Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
+
+            return redirect($request->getSchemeAndHttpHost().'/install/admin');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Migration error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()->withErrors(['migrate' => '数据库迁移或配置保存失败: '.$e->getMessage()]);
+        }
     }
 
     // ─── Step 3: Admin account ──────────────────────────────────────────
@@ -297,18 +301,25 @@ class InstallController extends Controller
     // ─── Helpers ────────────────────────────────────────────────────────
     private function writeEnv(array $values): void
     {
-        $path = base_path('.env');
-        if (! file_exists($path)) {
-            copy(base_path('.env.example'), $path);
+        try {
+            $path = base_path('.env');
+            if (! file_exists($path)) {
+                @copy(base_path('.env.example'), $path);
+            }
+            if (file_exists($path) && ! is_writable($path)) {
+                @chmod($path, 0666);
+            }
+            $content = @file_get_contents($path) ?: '';
+
+            // Values are quoted and written literally: an unquoted secret with a
+            // '#' or a space was cut short by the parser and finished the install
+            // with the wrong password, and a value carrying $1 was mangled by
+            // preg_replace's back-references. See EnvWriter.
+            $content = \App\Support\EnvWriter::apply($content, $values);
+
+            @file_put_contents($path, $content);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('writeEnv could not persist to .env: '.$e->getMessage());
         }
-        $content = file_get_contents($path);
-
-        // Values are quoted and written literally: an unquoted secret with a
-        // '#' or a space was cut short by the parser and finished the install
-        // with the wrong password, and a value carrying $1 was mangled by
-        // preg_replace's back-references. See EnvWriter.
-        $content = \App\Support\EnvWriter::apply($content, $values);
-
-        file_put_contents($path, $content);
     }
 }

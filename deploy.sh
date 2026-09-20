@@ -219,6 +219,7 @@ mkdir -p storage/framework/{cache,sessions,views} \
          lang/zh
 
 chmod -R 777 storage bootstrap/cache
+chmod 666 .env 2>/dev/null || true
 echo -e "${GREEN}      ✓ storage 与 bootstrap/cache 权限配置完毕！${NC}"
 
 # ------------------------------------------------------------------------------
