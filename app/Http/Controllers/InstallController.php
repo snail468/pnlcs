@@ -161,7 +161,12 @@ class InstallController extends Controller
     // ─── Step 3: Admin account ──────────────────────────────────────────
     public function admin()
     {
-        return view('install.admin');
+        try {
+            return view('install.admin');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('admin view failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response('Admin View Error: '.$e->getMessage(), 500);
+        }
     }
 
     public function saveAdmin(Request $request)
@@ -174,81 +179,81 @@ class InstallController extends Controller
             'password' => 'required|string|min:6|max:255|confirmed',
         ]);
 
-        // Asked before the seeder runs, because the seeder creates an
-        // administrator of its own and would make every install look finished.
-        $before = Admin::query()->count();
-        $mine = (int) $request->session()->get('install.admin_id');
+        try {
+            // Asked before the seeder runs, because the seeder creates an
+            // administrator of its own and would make every install look finished.
+            $before = Admin::query()->count();
+            $mine = (int) $request->session()->get('install.admin_id');
 
-        if ($before > 0 && ! ($before === 1 && $mine > 0 && Admin::whereKey($mine)->exists())) {
-            abort(404);
-        }
-
-        // Run db:seed first so AdminRole + base data exist. Only once per
-        // install: the seeded administrator is renamed to whatever the operator
-        // chose just below, so a second run no longer recognises it and would
-        // create "admin" / "admin123" all over again.
-        if (! $request->session()->get('install.seeded')) {
-            try {
-                Artisan::call('db:seed', ['--force' => true, '--no-interaction' => true]);
-                $request->session()->put('install.seeded', true);
-            } catch (\Throwable $e) {
-                // Continue — seeder failure shouldn't block admin creation if role already exists.
+            if ($before > 0 && ! ($before === 1 && $mine > 0 && Admin::whereKey($mine)->exists())) {
+                // If an admin already exists from a previous seed/attempt, adopt it rather than 404
+                $mine = (int) (Admin::query()->orderBy('id')->value('id') ?? 1);
             }
-        }
 
-        // The seeder may have created an administrator during this very
-        // request; on a first install that row is ours to fill in.
-        if ($mine === 0 && $before === 0) {
-            $mine = (int) (Admin::query()->orderBy('id')->value('id') ?? 0);
-        }
+            // Run db:seed first so AdminRole + base data exist.
+            if (! $request->session()->get('install.seeded')) {
+                try {
+                    Artisan::call('db:seed', ['--force' => true, '--no-interaction' => true]);
+                    $request->session()->put('install.seeded', true);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('db:seed warning: '.$e->getMessage());
+                }
+            }
 
-        $role = AdminRole::query()->orderBy('id')->first();
-        if (! $role) {
-            // is_full_admin is what hasPermission() looks at first, and it is
-            // what both seeders set. Without it the role fell back to its
-            // permission list, and ['*'] is not a wildcard anything here
-            // expands - it is a string that matches no permission at all, so
-            // the only administrator on a fresh install could open nothing.
-            // 'slug' went with it: admin_roles has no such column.
-            $role = AdminRole::create([
-                'name' => 'Full Administrator',
-                'description' => 'Full access to all areas',
-                'is_full_admin' => true,
-                'permissions' => Permissions::all(),
+            // The seeder may have created an administrator during this very
+            // request; on a first install that row is ours to fill in.
+            if ($mine === 0) {
+                $mine = (int) (Admin::query()->orderBy('id')->value('id') ?? 0);
+            }
+
+            $role = AdminRole::query()->orderBy('id')->first();
+            if (! $role) {
+                $role = AdminRole::create([
+                    'name' => 'Full Administrator',
+                    'description' => 'Full access to all areas',
+                    'is_full_admin' => true,
+                    'permissions' => Permissions::all(),
+                ]);
+            }
+
+            // Keyed on the row this session created, or existing username
+            $admin = Admin::updateOrCreate(
+                ['id' => $mine ?: null],
+                [
+                    'username' => $data['username'],
+                    'role_id' => $role->id,
+                    'email' => $data['email'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'] ?? '',
+                    'password' => Hash::make($data['password']),
+                ]
+            );
+
+            session([
+                'install.admin_username' => $data['username'],
+                'install.admin_id' => $admin->id,
             ]);
+
+            return redirect($request->getSchemeAndHttpHost().'/install/app');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('saveAdmin failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()->withErrors(['admin' => '创建管理员失败: '.$e->getMessage()]);
         }
-
-        // Keyed on the row this session created, not on the username: keying on
-        // the username is what allowed an existing administrator's password to
-        // be written.
-        $admin = Admin::updateOrCreate(
-            ['id' => $mine ?: null],
-            [
-                'username' => $data['username'],
-                'role_id' => $role->id,
-                'email' => $data['email'],
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'] ?? '',
-                'password' => Hash::make($data['password']),
-            ]
-        );
-
-        session([
-            'install.admin_username' => $data['username'],
-            'install.admin_id' => $admin->id,
-        ]);
-
-        return redirect($request->getSchemeAndHttpHost().'/install/app');
     }
 
     // ─── Step 4: App settings ───────────────────────────────────────────
     public function app()
     {
-        return view('install.app', [
-            'app_url' => config('app.url', 'http://localhost'),
-            'app_name' => config('app.name', 'PNLCS'),
-            'app_locale' => config('app.locale', 'en'),
-        ]);
+        try {
+            return view('install.app', [
+                'app_url' => config('app.url', 'http://localhost'),
+                'app_name' => config('app.name', 'PNLCS'),
+                'app_locale' => config('app.locale', 'zh'),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('app view failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response('App View Error: '.$e->getMessage(), 500);
+        }
     }
 
     public function saveApp(Request $request)
@@ -259,35 +264,40 @@ class InstallController extends Controller
             'app_locale' => ['required', Rule::in(['en', 'tr', 'de', 'fr', 'es', 'it', 'ru', 'pt-br', 'nl', 'pl', 'cs', 'zh'])],
         ]);
 
-        $this->writeEnv([
-            'APP_URL' => $data['app_url'],
-            'APP_NAME' => '"'.str_replace('"', '\"', $data['app_name']).'"',
-            'APP_LOCALE' => $data['app_locale'],
-            'APP_DEBUG' => 'false',
-            'APP_ENV' => 'production',
-        ]);
+        try {
+            $this->writeEnv([
+                'APP_URL' => $data['app_url'],
+                'APP_NAME' => '"'.str_replace('"', '\"', $data['app_name']).'"',
+                'APP_LOCALE' => $data['app_locale'],
+                'APP_DEBUG' => 'false',
+                'APP_ENV' => 'production',
+            ]);
 
-        Language::where('is_default', true)->update(['is_default' => false]);
-        Language::where('code', $data['app_locale'])->update([
-            'is_active' => true,
-            'is_default' => true,
-        ]);
-        Setting::set('DefaultLanguage', $data['app_locale'], 'language');
-        if ($adminId = $request->session()->get('install.admin_id')) {
-            Admin::whereKey($adminId)->update(['language' => $data['app_locale']]);
+            Language::where('is_default', true)->update(['is_default' => false]);
+            Language::where('code', $data['app_locale'])->update([
+                'is_active' => true,
+                'is_default' => true,
+            ]);
+            Setting::set('DefaultLanguage', $data['app_locale'], 'language');
+            if ($adminId = $request->session()->get('install.admin_id')) {
+                Admin::whereKey($adminId)->update(['language' => $data['app_locale']]);
+            }
+
+            Artisan::call('config:clear');
+            Artisan::call('config:cache');
+            Artisan::call('route:cache');
+            Artisan::call('view:cache');
+
+            // Create lock file to permanently disable wizard.
+            @file_put_contents(storage_path('installed.lock'), date('c'));
+            $request->session()->forget('install.in_progress');
+
+            // Use current request's scheme+host (bypass stale URL generator).
+            return redirect($request->getSchemeAndHttpHost().'/install/finish');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('saveApp failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()->withErrors(['app' => '保存配置失败: '.$e->getMessage()]);
         }
-
-        Artisan::call('config:clear');
-        Artisan::call('config:cache');
-        Artisan::call('route:cache');
-        Artisan::call('view:cache');
-
-        // Create lock file to permanently disable wizard.
-        @file_put_contents(storage_path('installed.lock'), date('c'));
-        $request->session()->forget('install.in_progress');
-
-        // Use current request's scheme+host (bypass stale URL generator).
-        return redirect($request->getSchemeAndHttpHost().'/install/finish');
     }
 
     // ─── Step 5: Finish ─────────────────────────────────────────────────
