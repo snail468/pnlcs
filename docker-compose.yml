@@ -65,6 +65,7 @@ services:
       - ./app/Http/Controllers/InstallController.php:/var/www/pnlcs/app/Http/Controllers/InstallController.php:ro
       - ./app/Http/Middleware/RedirectToInstaller.php:/var/www/pnlcs/app/Http/Middleware/RedirectToInstaller.php:ro
       - ./resources/views/install/database.blade.php:/var/www/pnlcs/resources/views/install/database.blade.php:ro
+      - ./database/seeders/TranslationSeeder.php:/var/www/pnlcs/database/seeders/TranslationSeeder.php:ro
       # 若需挂载整套本地源码进行二次开发调试，可取消下方注释：
       # - ./:/var/www/pnlcs
     # 依赖服务：确保数据库通过健康检查、Redis 启动完成后再启动 Web 容器
