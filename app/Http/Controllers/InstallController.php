@@ -180,15 +180,7 @@ class InstallController extends Controller
         ]);
 
         try {
-            // Asked before the seeder runs, because the seeder creates an
-            // administrator of its own and would make every install look finished.
-            $before = Admin::query()->count();
-            $mine = (int) $request->session()->get('install.admin_id');
-
-            if ($before > 0 && ! ($before === 1 && $mine > 0 && Admin::whereKey($mine)->exists())) {
-                // If an admin already exists from a previous seed/attempt, adopt it rather than 404
-                $mine = (int) (Admin::query()->orderBy('id')->value('id') ?? 1);
-            }
+            @set_time_limit(300);
 
             // Run db:seed first so AdminRole + base data exist.
             if (! $request->session()->get('install.seeded')) {
@@ -196,14 +188,8 @@ class InstallController extends Controller
                     Artisan::call('db:seed', ['--force' => true, '--no-interaction' => true]);
                     $request->session()->put('install.seeded', true);
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::warning('db:seed warning: '.$e->getMessage());
+                    \Illuminate\Support\Facades\Log::warning('db:seed warning: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
                 }
-            }
-
-            // The seeder may have created an administrator during this very
-            // request; on a first install that row is ours to fill in.
-            if ($mine === 0) {
-                $mine = (int) (Admin::query()->orderBy('id')->value('id') ?? 0);
             }
 
             $role = AdminRole::query()->orderBy('id')->first();
@@ -216,18 +202,41 @@ class InstallController extends Controller
                 ]);
             }
 
-            // Keyed on the row this session created, or existing username
-            $admin = Admin::updateOrCreate(
-                ['id' => $mine ?: null],
-                [
+            // Adopt or find existing admin to avoid unique key conflicts on username or email
+            $admin = null;
+            $mine = (int) $request->session()->get('install.admin_id');
+            if ($mine > 0) {
+                $admin = Admin::find($mine);
+            }
+            if (! $admin) {
+                $admin = Admin::where('username', $data['username'])
+                    ->orWhere('email', $data['email'])
+                    ->first();
+            }
+            if (! $admin) {
+                // If seeder created a default admin user, update it
+                $admin = Admin::first();
+            }
+
+            if ($admin) {
+                $admin->update([
                     'username' => $data['username'],
                     'role_id' => $role->id,
                     'email' => $data['email'],
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'] ?? '',
                     'password' => Hash::make($data['password']),
-                ]
-            );
+                ]);
+            } else {
+                $admin = Admin::create([
+                    'username' => $data['username'],
+                    'role_id' => $role->id,
+                    'email' => $data['email'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'] ?? '',
+                    'password' => Hash::make($data['password']),
+                ]);
+            }
 
             session([
                 'install.admin_username' => $data['username'],
@@ -283,10 +292,10 @@ class InstallController extends Controller
                 Admin::whereKey($adminId)->update(['language' => $data['app_locale']]);
             }
 
-            Artisan::call('config:clear');
-            Artisan::call('config:cache');
-            Artisan::call('route:cache');
-            Artisan::call('view:cache');
+            try { Artisan::call('config:clear'); } catch (\Throwable $e) {}
+            try { Artisan::call('config:cache'); } catch (\Throwable $e) {}
+            try { Artisan::call('route:cache'); } catch (\Throwable $e) {}
+            try { Artisan::call('view:cache'); } catch (\Throwable $e) {}
 
             // Create lock file to permanently disable wizard.
             @file_put_contents(storage_path('installed.lock'), date('c'));

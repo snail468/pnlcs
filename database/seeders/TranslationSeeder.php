@@ -4,25 +4,43 @@ namespace Database\Seeders;
 
 use App\Models\DynamicTranslation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class TranslationSeeder extends Seeder
 {
     public function run(): void
     {
         $translations = $this->getTranslations();
-        $count = 0;
+        $rows = [];
+        $now = now();
 
         foreach ($translations as $group => $keys) {
             foreach ($keys as $key => $value) {
-                DynamicTranslation::updateOrCreate(
-                    ["language" => "en", "group" => $group, "key" => $key],
-                    ["value" => $value, "is_auto_translated" => false, "is_reviewed" => true]
-                );
-                $count++;
+                $rows[] = [
+                    'language' => 'en',
+                    'group' => $group,
+                    'key' => $key,
+                    'value' => $value,
+                    'is_auto_translated' => 0,
+                    'is_reviewed' => 1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
         }
 
-        $this->command->info("Seeded {$count} English translation keys.");
+        foreach (array_chunk($rows, 200) as $chunk) {
+            DB::table('dynamic_translations')->upsert(
+                $chunk,
+                ['language', 'group', 'key'],
+                ['value', 'is_auto_translated', 'is_reviewed', 'updated_at']
+            );
+        }
+
+        $count = count($rows);
+        if ($this->command) {
+            $this->command->info("Seeded {$count} English translation keys.");
+        }
     }
 
     private function getTranslations(): array
