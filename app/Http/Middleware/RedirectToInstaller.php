@@ -47,6 +47,6 @@ class RedirectToInstaller
             // DB unreachable — fresh install path.
         }
 
-        return redirect('/install');
+        return redirect($request->getSchemeAndHttpHost().'/install');
     }
 }

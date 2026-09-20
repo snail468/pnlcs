@@ -190,6 +190,45 @@ http://你的服务器IP:8090/install
 
 ---
 
+### 🌐 反向代理与域名绑定配置（1Panel / 宝塔 / Nginx 规范）
+
+在生产环境中，推荐使用自定义域名并配置 SSL 证书进行反向代理。PNLCS 容器原生支持反向代理，并内置智能端口与协议检测。
+
+#### Nginx 标准反向代理配置示例（宿主机 Nginx / 宝塔面板 / 1Panel）：
+```nginx
+server {
+    listen 80;
+    listen 443 ssl http2;
+    server_name pnlcs.yourdomain.com; # 替换为您自己的域名
+
+    # SSL 证书配置（按实际路径配置）
+    # ssl_certificate /path/to/fullchain.pem;
+    # ssl_certificate_key /path/to/privkey.pem;
+
+    client_max_body_size 64M;
+
+    location / {
+        proxy_pass http://127.0.0.1:8090; # 对应 docker-compose.yml 中暴露的 APP_PORT
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Port $server_port;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 300s;
+    }
+}
+```
+
+> **常见疑问说明**：
+> - **为什么直接访问 IP:8090 打开 `/install` 会跳到 `/install/requirements` 报 404？**  
+>   因为宿主机通常有运行在 80 端口的 Web 管理面板（如宝塔、1Panel 或系统默认 Nginx）。在旧版本中，Docker 内部由 `/install` 重定向到 `/install/requirements` 时丢失了 8090 端口，浏览器自动跳向了宿主机 80 端口导致 404。  
+>   **最新版本已彻底解决此问题**：优化了容器内 Nginx 的端口透传机制，并在 `/install` 入口直接渲染检测页面，**直接通过 `http://服务器IP:8090/install` 或 `http(s)://反代域名/install` 均可 100% 顺畅打开！**
+
+---
+
 ## About — Open-Source WHMCS Alternative
 
 **PNLCS** is a free, open-source, self-hosted **hosting billing platform**

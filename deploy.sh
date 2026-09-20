@@ -253,8 +253,9 @@ while [ $COUNT -lt $MAX_WAIT ]; do
 done
 echo ""
 
-# 清除一次 Laravel 内部缓存，确保新配置立即刷新
+# 清除一次 Laravel 内部缓存并重载 Nginx，确保新配置立即刷新生效
 docker exec pnlcs php artisan optimize:clear > /dev/null 2>&1 || true
+docker exec pnlcs nginx -s reload > /dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
 # 7. 输出部署报告与安装指引
@@ -270,7 +271,8 @@ $COMPOSE_CMD ps
 echo ""
 
 echo -e "${CYAN}${BOLD}👉 请在浏览器中打开安装向导开始配置：${NC}"
-echo -e "   ${BOLD}${GREEN}${APP_URL}/install${NC}"
+echo -e "   - 直接 IP 访问:       ${BOLD}${GREEN}${APP_URL}/install${NC}"
+echo -e "   - 反向代理域名访问:   ${BOLD}${GREEN}http(s)://你的反代域名/install${NC}"
 echo ""
 
 echo -e "${YELLOW}${BOLD}安装向导数据库连接填写提示：${NC}"

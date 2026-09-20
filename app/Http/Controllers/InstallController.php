@@ -36,7 +36,7 @@ class InstallController extends Controller
 
     public function index()
     {
-        return redirect('/install/requirements');
+        return $this->requirements();
     }
 
     // ─── Step 1: Requirements ───────────────────────────────────────────
@@ -77,7 +77,7 @@ class InstallController extends Controller
         // If migrations already applied (Docker case), skip DB step.
         try {
             if (Schema::hasTable('migrations')) {
-                return redirect('/install/admin');
+                return redirect(request()->getSchemeAndHttpHost().'/install/admin');
             }
         } catch (\Throwable $e) { /* DB not configured yet */
         }
@@ -150,7 +150,7 @@ class InstallController extends Controller
             return back()->withInput()->withErrors(['migrate' => 'Migration failed: '.$e->getMessage()]);
         }
 
-        return redirect('/install/admin');
+        return redirect($request->getSchemeAndHttpHost().'/install/admin');
     }
 
     // ─── Step 3: Admin account ──────────────────────────────────────────
@@ -233,7 +233,7 @@ class InstallController extends Controller
             'install.admin_id' => $admin->id,
         ]);
 
-        return redirect('/install/app');
+        return redirect($request->getSchemeAndHttpHost().'/install/app');
     }
 
     // ─── Step 4: App settings ───────────────────────────────────────────
