@@ -1516,4 +1516,8 @@ return [
     'store.res_php_memory_mb' => "PHP 内存限制 (MB)",
     'store.res_php_exec' => "PHP 执行超时时长 (秒)",
     'store.res_php_upload' => "PHP 最大上传限制 (MB)",
+
+    // Added for 100% complete localization
+    'services.soon' => '即将推出',
+    'payment_methods.ending_in' => '尾号为 :last4',
 ];

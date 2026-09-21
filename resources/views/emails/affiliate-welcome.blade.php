@@ -9,7 +9,7 @@
 
 <table style="width:100%;border-collapse:collapse;margin:20px 0;">
 <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>{{ __('email.affiliate_welcome.commission_rate') }}</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">{{ $affiliate->pay_type === 'percentage' ? rtrim(rtrim(number_format((float) $affiliate->pay_amount, 2), '0'), '.').'%' : number_format((float) $affiliate->pay_amount, 2) }}</td></tr>
-<tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>{{ __('email.affiliate_welcome.commission_type') }}</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">{{ ucfirst($affiliate->pay_type ?? 'percentage') }}</td></tr>
+<tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>{{ __('email.affiliate_welcome.commission_type') }}</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">{{ ($affiliate->pay_type ?? 'percentage') === 'percentage' ? __('admin.affiliates.pay_percentage', '百分比佣金') : __('admin.affiliates.pay_fixed', '固定金额') }}</td></tr>
 </table>
 
 <h3 style="color:#405189;font-size:16px;">{{ __('email.affiliate_welcome.how_it_works') }}</h3>

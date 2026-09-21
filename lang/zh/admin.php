@@ -3041,4 +3041,20 @@ return [
     'products.on' => "开启",
     'products.off' => "关闭",
     'products.setup_fee' => "初装费",
+
+    // Added for 100% complete localization
+    'products.unit_product' => '个产品',
+    'products.catalog_name_placeholder' => '如：IT 技术支持服务',
+    'products.catalog_unit_placeholder' => '件 / 小时 / 次',
+    'domains.total_count' => '共 :count 条',
+    'domains.soon' => '即将到期',
+    'domains.expired_tag' => '已到期',
+    'domains.type_register' => '新注册',
+    'domains.type_transfer' => '域名转入',
+    'tickets.staff_prefix' => '官方客服: ',
+    'projects.tasks_count' => '个任务',
+    'quotes.no_items_hint' => '暂无明细项，请点击上方“+ 添加明细项”',
+    'affiliates.pay_percentage' => '百分比佣金',
+    'affiliates.pay_fixed' => '固定金额',
+    'ticket_spam.content_placeholder' => '例如：@spammail.com 或 casino',
 ];

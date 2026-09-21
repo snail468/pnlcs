@@ -219,6 +219,7 @@ return [
         'fraud' => 'Fraud',
         'in_progress' => 'In Progress',
         'inactive' => 'Inactive',
+        'new' => 'New',
         'no' => 'No',
         'on_hold' => 'On Hold',
         'open' => 'Open',
@@ -322,4 +323,7 @@ return [
     'table.title' => 'Title',
     'table.total' => 'Total',
     'yes' => 'Yes',
+
+    // Added for 100% complete localization
+    'status.redemption' => 'Redemption',
 ];

@@ -1,5 +1,5 @@
 @extends("admin.layouts.app")
-@section("title", __("admin.products.title"))
+@section("title", __("admin.services.title"))
 @section("content")
 
 <div class="page-header">
@@ -8,7 +8,14 @@
 
 <!-- Status Filter Tabs -->
 <div style="margin-bottom:16px;border-bottom:1px solid #ddd;display:flex;gap:0;flex-wrap:wrap;">
-    @foreach(["" => "All", "active" => "Active", "suspended" => "Suspended", "terminated" => "Terminated", "pending" => "Pending", "cancelled" => "Cancelled"] as $val => $label)
+    @foreach([
+        "" => __('admin.services.status_all', '全部'),
+        "active" => __('admin.services.status_active', '已激活'),
+        "suspended" => __('admin.services.status_suspended', '已暂停'),
+        "terminated" => __('admin.services.status_terminated', '已终止'),
+        "pending" => __('admin.services.status_pending', '待审核'),
+        "cancelled" => __('admin.services.status_cancelled', '已取消')
+    ] as $val => $label)
     @php $isActive = (request("status","") == $val); @endphp
     <a href="{{ route("admin.services.index", ["status" => $val]) }}"
        style="display:inline-block;padding:8px 16px;font-size:13px;text-decoration:none;color:{{ $isActive ? "#1a4d80" : "#666" }};font-weight:{{ $isActive ? "700" : "400" }};border-bottom:{{ $isActive ? "3px solid #1a4d80" : "3px solid transparent" }};margin-bottom:-1px;">
@@ -54,10 +61,10 @@
                     @else N/A @endif
                 </td>
                 <td style="font-family:monospace;font-size:12px;color:#666;">{{ $service->domain ?? "-" }}</td>
-                <td style="color:#666;">{{ ucfirst($service->billing_cycle ?? "-") }}</td>
+                <td style="color:#666;">{{ $service->billing_cycle ? __('client.cart.cycle_' . strtolower($service->billing_cycle), ucfirst($service->billing_cycle)) : "-" }}</td>
                 <td style="text-align:right;font-weight:500;">{{ money_fmt($service->amount) }}</td>
                 <td style="color:#666;">{{ $service->next_due_date?->format(date_fmt()) ?? "-" }}</td>
-                <td><span class="badge {{ $badgeClass }}">{{ ucfirst($service->status ?? "") }}</span></td>
+                <td><span class="badge {{ $badgeClass }}">{{ __('common.status.' . strtolower($service->status ?? ''), ucfirst($service->status ?? '')) }}</span></td>
                 <td>
                     <a href="{{ route("admin.services.show", $service) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>
                 </td>

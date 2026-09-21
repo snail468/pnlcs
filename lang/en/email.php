@@ -291,4 +291,13 @@ return [
         'nothing_taken' => 'Nothing has been taken from your card.',
         'what_to_do' => 'Open the invoice and use the "Confirm with your bank" button on it. That finishes the payment we already started, so you are not charged twice.',
     ],
+
+    // Added for 100% complete localization
+    'password_reset' => [
+        'intro' => 'We received a request to reset the password for your account (:email).',
+        'button_hint' => 'Click the button below to choose a new password. This link expires in 60 minutes.',
+        'action_button' => 'Reset password',
+        'fallback_hint' => 'If the button does not work, copy and paste this URL into your browser:',
+        'ignore_hint' => 'If you did not request a password reset, you can safely ignore this email — your password will not change.',
+    ],
 ];

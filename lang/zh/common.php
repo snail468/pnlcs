@@ -220,6 +220,7 @@ return [
         'grace' => '宽限期',
         'in_progress' => '处理中',
         'inactive' => '未启用',
+        'new' => '新建',
         'no' => '否',
         'on_hold' => '暂缓',
         'open' => '已开启',
@@ -323,4 +324,7 @@ return [
     'table.title' => '标题',
     'table.total' => '合计',
     'yes' => '是',
+
+    // Added for 100% complete localization
+    'status.redemption' => '赎回期',
 ];

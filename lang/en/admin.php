@@ -3023,4 +3023,20 @@ return [
     'products.on' => "On",
     'products.off' => "Off",
     'products.setup_fee' => "Setup Fee",
+
+    // Added for 100% complete localization
+    'products.unit_product' => 'product(s)',
+    'products.catalog_name_placeholder' => 'e.g. IT Support Service',
+    'products.catalog_unit_placeholder' => 'pcs / hr',
+    'domains.total_count' => ':count total',
+    'domains.soon' => 'soon',
+    'domains.expired_tag' => 'expired',
+    'domains.type_register' => 'Registration',
+    'domains.type_transfer' => 'Transfer',
+    'tickets.staff_prefix' => 'Staff: ',
+    'projects.tasks_count' => 'tasks',
+    'quotes.no_items_hint' => 'No items. Click "+ Add Item".',
+    'affiliates.pay_percentage' => 'Percentage',
+    'affiliates.pay_fixed' => 'Fixed Amount',
+    'ticket_spam.content_placeholder' => 'e.g. @spammail.com or casino',
 ];

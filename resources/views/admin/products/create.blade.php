@@ -4,7 +4,7 @@
 
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
     <h1>{{ __('admin.products.create_product') }}</h1>
-    <a href="{{ route('admin.products.index') }}" class="btn btn-default btn-sm">&larr; Back</a>
+    <a href="{{ route('admin.products.index') }}" class="btn btn-default btn-sm">&larr; {{ __('common.actions.back') }}</a>
 </div>
 
 @if($errors->any())
@@ -72,7 +72,7 @@
                 <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
                     @foreach(['monthly','quarterly','semiannually','annually','biennially','triennially'] as $cycle)
                     <div>
-                        <label class="form-label" style="text-transform:capitalize;">{{ $cycle }}</label>
+                        <label class="form-label">{{ __('client.cart.cycle_' . $cycle) }}</label>
                         <input type="number" step="0.01" name="pricing[{{ $currency->id }}][{{ $cycle }}]" value="-1" class="form-control" style="font-size:12px;">
                     </div>
                     @endforeach

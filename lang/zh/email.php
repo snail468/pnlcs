@@ -290,4 +290,13 @@ return [
         'nothing_taken' => '尚未从您的卡中扣除任何款项。',
         'what_to_do' => '打开该发票，点击上面的"向银行确认"按钮。它会完成我们已经发起的那笔付款，因此不会重复扣款。',
     ],
+
+    // Added for 100% complete localization
+    'password_reset' => [
+        'intro' => '我们收到了重置您账户 (:email) 密码的请求。',
+        'button_hint' => '请点击下方按钮设置新密码。此链接在 60 分钟内有效。',
+        'action_button' => '重置密码',
+        'fallback_hint' => '若按钮无法点击，请复制以下链接粘贴到浏览器中打开：',
+        'ignore_hint' => '如果您未曾请求重置密码，可以忽略此邮件，您的密码不会发生改变。',
+    ],
 ];

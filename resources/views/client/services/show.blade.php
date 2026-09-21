@@ -73,9 +73,9 @@
     $tools = [
         ['k'=>'files','name'=>__('client.hosting.files.title'),'desc'=>__('client.hosting.files.subtitle'),'ic'=>'ri-folder-open-line','c'=>'#3b82f6','route'=>route('client.services.files',$service)],
         ['k'=>'emails','name'=>__('client.hosting.email.title'),'desc'=>__('client.hosting.email.subtitle'),'ic'=>'ri-mail-line','c'=>'#8b5cf6','route'=>route('client.services.emails',$service)],
-        ['k'=>'databases','name'=>'Databases','desc'=>'MySQL databases & users','ic'=>'ri-database-2-line','c'=>'#0ea5e9','route'=>route('client.services.databases',$service)],
-        ['k'=>'ftp','name'=>'FTP Accounts','desc'=>'Manage FTP access','ic'=>'ri-folder-transfer-line','c'=>'#f59e0b','route'=>route('client.services.ftp',$service)],
-        ['k'=>'subdomains','name'=>'Subdomains','desc'=>'Create subdomains','ic'=>'ri-node-tree','c'=>'#10b981','route'=>route('client.services.subdomains',$service)],
+        ['k'=>'databases','name'=>__('client.hosting.databases.title', '数据库管理'),'desc'=>__('client.hosting.databases.subtitle', 'MySQL 数据库与用户管理'),'ic'=>'ri-database-2-line','c'=>'#0ea5e9','route'=>route('client.services.databases',$service)],
+        ['k'=>'ftp','name'=>__('client.hosting.ftp.title', 'FTP 账户'),'desc'=>__('client.hosting.ftp.subtitle', '管理 FTP 访问与连接权限'),'ic'=>'ri-folder-transfer-line','c'=>'#f59e0b','route'=>route('client.services.ftp',$service)],
+        ['k'=>'subdomains','name'=>__('client.hosting.subdomains.title', '子域名管理'),'desc'=>__('client.hosting.subdomains.subtitle', '创建与管理子域名'),'ic'=>'ri-node-tree','c'=>'#10b981','route'=>route('client.services.subdomains',$service)],
         ['k'=>'dns','name'=>__('client.hosting.dns.title'),'desc'=>__('client.hosting.dns.subtitle'),'ic'=>'ri-global-line','c'=>'#6366f1','route'=>route('client.services.dns',$service)],
         ['k'=>'cron','name'=>__('client.hosting.cron.title'),'desc'=>__('client.hosting.cron.subtitle'),'ic'=>'ri-time-line','c'=>'#ec4899','route'=>route('client.services.cron',$service)],
         ['k'=>'backups','name'=>__('client.hosting.backups.title'),'desc'=>__('client.hosting.backups.subtitle'),'ic'=>'ri-archive-2-line','c'=>'#64748b','route'=>route('client.services.backups',$service)],
@@ -96,7 +96,7 @@
             <div class="sv-hicon"><i class="ri-server-line"></i></div>
             <div>
                 <h1>{{ $service->domain ?: ($service->product?->name ?? __('client.services.title')) }}</h1>
-                <div class="s">{{ $service->product?->name }} @if($service->domain)&middot; {{ ucfirst($service->billing_cycle) }}@endif</div>
+                <div class="s">{{ $service->product?->name }} @if($service->domain)&middot; {{ __('client.cart.cycle_' . strtolower($service->billing_cycle), ucfirst($service->billing_cycle)) }}@endif</div>
             </div>
         </div>
         <span class="sv-status"><span class="d" style="{{ $st==='active'?'':'background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.3)' }}"></span>{{ __('client.status.' . $st) }}</span>
@@ -154,7 +154,7 @@
         </a>
         @else
         <div class="sv-app soon">
-            <span class="sv-soon">Soon</span>
+            <span class="sv-soon">{{ __('client.services.soon', '即将推出') }}</span>
             <span class="sv-aic" style="background:{{ $t['c'] }}1a;color:{{ $t['c'] }}"><i class="{{ $t['ic'] }}"></i></span>
             <div><div class="sv-aname">{{ $t['name'] }}</div><div class="sv-adesc">{{ $t['desc'] }}</div></div>
         </div>
@@ -169,8 +169,8 @@
         <div class="sv-ph">{{ __('client.services.service_details') }}</div>
         <ul class="sv-dl">
             <li><span class="k">{{ __('client.cart.product') }}</span><span class="v">{{ $service->product?->name ?? '—' }}</span></li>
-            <li><span class="k">{{ __('client.cart.billing_cycle') }}</span><span class="v" style="text-transform:capitalize">{{ $service->billing_cycle ?? '—' }}</span></li>
-            <li><span class="k">{{ __('client.services.amount') }}</span><span class="v">{{ money_fmt($service->amount) }} / {{ $service->billing_cycle }}</span></li>
+            <li><span class="k">{{ __('client.cart.billing_cycle') }}</span><span class="v">{{ $service->billing_cycle ? __('client.cart.cycle_' . strtolower($service->billing_cycle), ucfirst($service->billing_cycle)) : '—' }}</span></li>
+            <li><span class="k">{{ __('client.services.amount') }}</span><span class="v">{{ money_fmt($service->amount) }} / {{ $service->billing_cycle ? __('client.cart.cycle_' . strtolower($service->billing_cycle), ucfirst($service->billing_cycle)) : '—' }}</span></li>
             <li><span class="k">{{ __('client.services.next_due_date') }}</span><span class="v">{{ $service->next_due_date?->format(date_fmt()) ?? '—' }}</span></li>
             <li><span class="k">{{ __('client.services.registration_date') }}</span><span class="v">{{ $service->registration_date?->format(date_fmt()) ?? '—' }}</span></li>
             <li><span class="k">{{ __('client.services.auto_renew') }}</span><span class="v">
@@ -198,7 +198,7 @@
     <div style="overflow-x:auto"><table class="pn-table">
         <thead><tr><th>{{ __('common.table.name') }}</th><th>{{ __('common.table.amount') }}</th><th>{{ __('common.table.billing_cycle') }}</th><th>{{ __('client.services.next_due_date') }}</th><th>{{ __('common.table.status') }}</th><th style="text-align:right">{{ __('common.table.actions') }}</th></tr></thead>
         <tbody>@foreach($service->addons as $addon)<tr>
-            <td>{{ $addon->label() }}</td><td>{{ money_fmt($addon->amount) }}</td><td style="text-transform:capitalize">{{ $addon->billing_cycle }}</td>
+            <td>{{ $addon->label() }}</td><td>{{ money_fmt($addon->amount) }}</td><td>{{ $addon->billing_cycle ? __('client.cart.cycle_' . strtolower($addon->billing_cycle), ucfirst($addon->billing_cycle)) : '-' }}</td>
             <td class="text-muted text-sm">{{ $addon->next_due_date?->format(date_fmt()) ?? '-' }}</td>
             <td><span class="badge badge-{{ strtolower($addon->status) }}">{{ __('client.status.' . strtolower($addon->status)) }}</span></td>
             <td style="text-align:right">@if(in_array(strtolower($addon->status),['active','pending'],true))<form method="POST" action="{{ route('client.services.addons.cancel',[$service,$addon]) }}" onsubmit="return confirm('{{ __('client.services.addon_cancel_confirm') }}')">@csrf<button type="submit" class="pn-btn pn-btn-sm pn-btn-danger">{{ __('client.services.addon_cancel') }}</button></form>@endif</td>

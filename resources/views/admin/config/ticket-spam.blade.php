@@ -66,7 +66,7 @@
         <tbody>
         @foreach($filters as $filter)
         <tr>
-            <td><span class="badge {{ $filter->type === 'email' ? 'badge-pending' : 'badge-open' }}">{{ ucfirst($filter->type) }}</span></td>
+            <td><span class="badge {{ $filter->type === 'email' ? 'badge-pending' : 'badge-open' }}">{{ $filter->type === 'email' ? __('admin.ticket_spam.email_pattern', '邮箱规则') : __('admin.ticket_spam.keyword', '关键词') }}</span></td>
             <td><code>{{ $filter->content }}</code></td>
             <td style="font-size:12px;">{{ $filter->created_at?->format(date_fmt()) ?? '-' }}</td>
             <td style="text-align:right;">
@@ -100,7 +100,7 @@
                     </select>
                 </div>
                 <div class="form-group"><label class="form-label">{{ __('admin.ticket_spam.content') }} *</label>
-                    <input type="text" name="content" required class="form-control" placeholder="e.g. @spammail.com or casino">
+                    <input type="text" name="content" required class="form-control" placeholder="{{ __('admin.ticket_spam.content_placeholder', '例如：@spammail.com 或 casino') }}">
                 </div>
             </div>
             <div style="padding:12px 20px;border-top:1px solid #e5e5e5;display:flex;gap:8px;justify-content:flex-end;">

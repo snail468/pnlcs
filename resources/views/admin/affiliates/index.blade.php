@@ -49,7 +49,7 @@
             <tr>
                 <td><a href="{{ route('admin.affiliates.show', $aff) }}">{{ $aff->client?->first_name }} {{ $aff->client?->last_name }}</a></td>
                 <td>{{ number_format($aff->visitors) }}</td>
-                <td>{{ ucfirst($aff->pay_type) }}</td>
+                <td>{{ __('admin.affiliates.pay_' . $aff->pay_type, ucfirst($aff->pay_type)) }}</td>
                 <td>{{ $aff->pay_type === 'percentage' ? $aff->pay_amount . '%' : '$' . number_format($aff->pay_amount, 2) }}</td>
                 <td><strong>{{ money_fmt($aff->balance) }}</strong></td>
                 <td>{{ money_fmt($aff->withdrawn) }}</td>

@@ -4,8 +4,8 @@
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
     <h1>
         #{{ $ticket->tid }} &mdash; {{ $ticket->title }}
-        <span class="badge-{{ strtolower($ticket->status) }}" style="font-size:12px;vertical-align:middle;margin-left:6px;">{{ ucfirst($ticket->status) }}</span>
-        <span style="font-size:12px;vertical-align:middle;margin-left:4px;padding:2px 8px;background:#e9e9e9;border-radius:3px;color:#555;">{{ ucfirst($ticket->priority) }}</span>
+        <span class="badge-{{ strtolower($ticket->status) }}" style="font-size:12px;vertical-align:middle;margin-left:6px;">{{ __('admin.tickets.status_' . str_replace([' ', '-'], '_', strtolower($ticket->status)), ucfirst($ticket->status)) }}</span>
+        <span style="font-size:12px;vertical-align:middle;margin-left:4px;padding:2px 8px;background:#e9e9e9;border-radius:3px;color:#555;">{{ __('admin.tickets.priority_' . strtolower($ticket->priority), ucfirst($ticket->priority)) }}</span>
     </h1>
     <a href="{{ route('admin.tickets.index') }}" class="btn btn-default btn-sm">&larr; {{ __('admin.tickets.back') }}</a>
 </div>
@@ -45,7 +45,7 @@
 @foreach($ticket->replies as $reply)
 <div style="margin-bottom:10px;border-radius:4px;overflow:hidden;border:1px solid {{ $reply->admin ? '#bce8f1' : '#ddd' }};border-left:4px solid {{ $reply->admin ? '#31708f' : '#ccc' }};">
     <div style="padding:8px 15px;background:{{ $reply->admin ? '#d9edf7' : '#f9f9f9' }};display:flex;justify-content:space-between;align-items:center;">
-        <strong style="font-size:13px;">{{ $reply->admin ? 'Staff: '.$reply->admin : ($ticket->client?->full_name ?? $ticket->name ?? $ticket->email) }}</strong>
+        <strong style="font-size:13px;">{{ $reply->admin ? __('admin.tickets.staff_prefix', '官方客服: ').$reply->admin : ($ticket->client?->full_name ?? $ticket->name ?? $ticket->email) }}</strong>
         <span style="font-size:12px;color:#777;">{{ $reply->created_at->timezone(display_tz())->format(datetime_fmt()) }}</span>
     </div>
     <div style="padding:12px 15px;font-size:13px;line-height:1.6;color:#333;background:#fff;">{!! nl2br(e($reply->message)) !!}</div>

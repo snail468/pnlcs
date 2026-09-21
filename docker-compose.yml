@@ -57,35 +57,16 @@ services:
     volumes:
       # 1. 持久化存储应用目录（包含工单附件、上传的Logo/图标、备份文件、日志以及安装锁定标记 installed.lock）
       - pnlcs-storage:/var/www/pnlcs/storage
-      # 2. 挂载本地最新深度汉化语言包（确保中文本地化立即生效且支持热更新）
-      - ./lang/zh:/var/www/pnlcs/lang/zh:ro
-      - ./lang/zh.json:/var/www/pnlcs/lang/zh.json:ro
-      - ./lang/en:/var/www/pnlcs/lang/en:ro
-      # 3. 挂载 Nginx 代理端口修复配置与核心控制/视图（确保 git pull 后无需重新编译镜像即可即时生效）
+      # 2. 挂载本地代码、视图与语言包目录（实现 100% 完整深度汉化与热更新，无需重新编译镜像）
+      - ./lang:/var/www/pnlcs/lang:ro
+      - ./resources/views:/var/www/pnlcs/resources/views:ro
+      - ./app:/var/www/pnlcs/app:ro
+      - ./routes:/var/www/pnlcs/routes:ro
+      - ./database:/var/www/pnlcs/database:ro
+      # 3. 挂载 Nginx 代理端口修复配置与引导入口
       - ./docker/nginx.conf:/etc/nginx/conf.d/pnlcs.conf:ro
       - ./public/index.php:/var/www/pnlcs/public/index.php:ro
       - ./bootstrap/app.php:/var/www/pnlcs/bootstrap/app.php:ro
-      - ./app/Providers/AppServiceProvider.php:/var/www/pnlcs/app/Providers/AppServiceProvider.php:ro
-      - ./app/Http/Controllers/InstallController.php:/var/www/pnlcs/app/Http/Controllers/InstallController.php:ro
-      - ./app/Http/Controllers/Admin/AuthController.php:/var/www/pnlcs/app/Http/Controllers/Admin/AuthController.php:ro
-      - ./app/Http/Controllers/Client/AuthController.php:/var/www/pnlcs/app/Http/Controllers/Client/AuthController.php:ro
-      - ./app/Http/Controllers/LegalController.php:/var/www/pnlcs/app/Http/Controllers/LegalController.php:ro
-      - ./app/Translation/TranslationCacheManager.php:/var/www/pnlcs/app/Translation/TranslationCacheManager.php:ro
-      - ./app/Http/Middleware/RedirectToInstaller.php:/var/www/pnlcs/app/Http/Middleware/RedirectToInstaller.php:ro
-      - ./app/Http/Middleware/AdminAuthenticate.php:/var/www/pnlcs/app/Http/Middleware/AdminAuthenticate.php:ro
-      - ./app/Http/Middleware/AdminTwoFactorVerify.php:/var/www/pnlcs/app/Http/Middleware/AdminTwoFactorVerify.php:ro
-      - ./resources/views/install/database.blade.php:/var/www/pnlcs/resources/views/install/database.blade.php:ro
-      - ./resources/views/admin/auth/login.blade.php:/var/www/pnlcs/resources/views/admin/auth/login.blade.php:ro
-      - ./resources/views/client/auth/login.blade.php:/var/www/pnlcs/resources/views/client/auth/login.blade.php:ro
-      - ./resources/views/legal:/var/www/pnlcs/resources/views/legal:ro
-      - ./resources/views/pages/mail-setup.blade.php:/var/www/pnlcs/resources/views/pages/mail-setup.blade.php:ro
-      - ./resources/views/pages/ssl.blade.php:/var/www/pnlcs/resources/views/pages/ssl.blade.php:ro
-      - ./resources/views/admin/clients/show.blade.php:/var/www/pnlcs/resources/views/admin/clients/show.blade.php:ro
-      - ./resources/views/admin/products/edit.blade.php:/var/www/pnlcs/resources/views/admin/products/edit.blade.php:ro
-      - ./resources/views/admin/settings/appearance.blade.php:/var/www/pnlcs/resources/views/admin/settings/appearance.blade.php:ro
-      - ./resources/views/admin/config/servers.blade.php:/var/www/pnlcs/resources/views/admin/config/servers.blade.php:ro
-      - ./resources/views/admin/whois.blade.php:/var/www/pnlcs/resources/views/admin/whois.blade.php:ro
-      - ./database/seeders/TranslationSeeder.php:/var/www/pnlcs/database/seeders/TranslationSeeder.php:ro
       # 若需挂载整套本地源码进行二次开发调试，可取消下方注释：
       # - ./:/var/www/pnlcs
     # 依赖服务：确保底层数据库与 Redis 容器启动

@@ -1264,4 +1264,8 @@ return [
     'store.res_php_memory_mb' => "PHP Memory Limit (MB)",
     'store.res_php_exec' => "PHP Max Execution Time (s)",
     'store.res_php_upload' => "PHP Max Upload Size (MB)",
+
+    // Added for 100% complete localization
+    'services.soon' => 'Soon',
+    'payment_methods.ending_in' => 'ending :last4',
 ];
