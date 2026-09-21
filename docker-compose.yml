@@ -63,6 +63,7 @@ services:
       - ./app:/var/www/pnlcs/app:ro
       - ./routes:/var/www/pnlcs/routes:ro
       - ./database:/var/www/pnlcs/database:ro
+      - ./config:/var/www/pnlcs/config:ro
       # 3. 挂载 Nginx 代理端口修复配置与引导入口
       - ./docker/nginx.conf:/etc/nginx/conf.d/pnlcs.conf:ro
       - ./public/index.php:/var/www/pnlcs/public/index.php:ro

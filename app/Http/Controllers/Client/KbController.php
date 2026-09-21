@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\KbArticle;
 use App\Models\KbCategory;
+use Illuminate\Http\Request;
 
 class KbController extends Controller
 {
@@ -24,16 +25,31 @@ class KbController extends Controller
      * `private`, and nothing here used to look at it — an article taken down,
      * or one still being written, stayed readable to anyone with the URL.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $searchQuery = trim((string) $request->get('q', ''));
+
         $categories = KbCategory::where('hidden', false)
             ->whereNull('parent_id')
             ->with(['articles' => fn ($q) => $q->where('private', false)])
             ->orderBy('sort_order')
             ->get();
 
-        return view('client.kb.index', compact('categories'));
+        if ($searchQuery !== '') {
+            $lowerQ = mb_strtolower($searchQuery);
+            $categories = $categories->filter(function ($cat) use ($lowerQ) {
+                $filteredArticles = $cat->articles->filter(function ($art) use ($lowerQ) {
+                    return str_contains(mb_strtolower($art->title), $lowerQ) ||
+                           str_contains(mb_strtolower($art->article), $lowerQ);
+                });
+                $cat->setRelation('articles', $filteredArticles);
+                return $filteredArticles->isNotEmpty() || str_contains(mb_strtolower($cat->name), $lowerQ);
+            });
+        }
+
+        return view('client.kb.index', compact('categories', 'searchQuery'));
     }
+
 
     public function show(KbArticle $article)
     {
