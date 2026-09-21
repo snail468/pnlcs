@@ -39,7 +39,7 @@
                 @endphp
                 <tr>
                     <td style="font-weight:600"><a href="{{ route('client.domains.show', $d) }}" style="text-decoration:none;color:inherit;">{{ $d->domain }}</a></td>
-                    <td><span class="badge badge-{{ strtolower($d->status) }}">{{ __('common.status.' . strtolower($d->status), ucfirst($d->status)) }}</span></td>
+                    <td><span class="badge badge-{{ strtolower($d->status) }}">{{ __('common.status.' . strtolower($d->status)) }}</span></td>
                     <td class="text-muted text-sm">{{ $d->registration_date?->format(date_fmt()) ?? "-" }}</td>
                     <td style="{{ $expired ? "color:var(--danger);font-weight:600" : ($expiringSoon ? "color:var(--warning);font-weight:600" : "") }}">
                         {{ $d->expiry_date?->format(date_fmt()) ?? "-" }}

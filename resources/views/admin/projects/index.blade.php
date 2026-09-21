@@ -7,11 +7,11 @@
 </div>
 <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
     @foreach([
-        '' => __('admin.projects.status_all', '全部'),
-        'pending' => __('admin.projects.status_pending', '待处理'),
-        'in_progress' => __('admin.projects.status_in_progress', '进行中'),
-        'completed' => __('admin.projects.status_completed', '已完成'),
-        'cancelled' => __('admin.projects.status_cancelled', '已取消')
+        '' => __('common.form.all'),
+        'pending' => __('common.status.pending'),
+        'in_progress' => __('common.status.in_progress'),
+        'completed' => __('common.status.completed'),
+        'cancelled' => __('common.status.cancelled')
     ] as $val => $label)
     <a href="{{ route('admin.projects.index', ['status'=>$val,'search'=>request('search')]) }}"
        class="btn btn-sm {{ request('status')==$val ? 'btn-primary' : 'btn-default' }}">{{ $label }}</a>
@@ -42,12 +42,12 @@
                     @if($project->description)<div style="font-size:12px;color:#999;margin-top:2px;">{{ Str::limit($project->description,60) }}</div>@endif
                 </td>
                 <td>{{ $project->client?->full_name ?? 'N/A' }}</td>
-                <td><span class="{{ $badgeClass }}">{{ __('admin.projects.status_' . $project->status, ucfirst(str_replace('_',' ',$project->status))) }}</span></td>
+                <td><span class="{{ $badgeClass }}">{{ __('common.status.' . strtolower($project->status)) }}</span></td>
                 <td style="min-width:120px;">
                     <div style="background:#e9e9e9;border-radius:3px;height:10px;margin-bottom:3px;">
                         <div style="height:10px;border-radius:3px;background:#337ab7;width:{{ $pct }}%;"></div>
                     </div>
-                    <span style="font-size:11px;color:#777;">{{ $done }}/{{ $total }} {{ __('admin.projects.tasks_count', '个任务') }}</span>
+                    <span style="font-size:11px;color:#777;">{{ $done }}/{{ $total }} {{ __('admin.projects.tasks_count') }}</span>
                 </td>
                 <td style="font-size:12px;color:#777;">{{ $project->due_date ? \Carbon\Carbon::parse($project->due_date)->format(date_fmt()) : '-' }}</td>
                 <td>

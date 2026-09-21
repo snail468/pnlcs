@@ -327,4 +327,7 @@ return [
 
     // Added for 100% complete localization
     'status.redemption' => '赎回期',
+    'status.all' => '全部',
+    'all' => '全部',
 ];
+

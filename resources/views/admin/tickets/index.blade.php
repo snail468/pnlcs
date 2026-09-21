@@ -9,12 +9,12 @@
 <!-- Status Filter Tabs -->
 <div style="margin-bottom:16px;border-bottom:1px solid #ddd;display:flex;gap:0;flex-wrap:wrap;">
     @foreach([
-        "" => __('admin.tickets.status_all', '全部'),
-        "open" => __('admin.tickets.status_open', '开启'),
-        "answered" => __('admin.tickets.status_answered', '已回复'),
-        "customer-reply" => __('admin.tickets.status_customer_reply', '客户已回复'),
-        "closed" => __('admin.tickets.status_closed', '已关闭'),
-        "on hold" => __('admin.tickets.status_on_hold', '搁置中')
+        "" => __('common.form.all'),
+        "open" => __('common.status.open'),
+        "answered" => __('common.status.answered'),
+        "customer-reply" => __('common.status.customer_reply'),
+        "closed" => __('common.status.closed'),
+        "on hold" => __('common.status.on_hold')
     ] as $val => $label)
     @php $isActive = (request("status","") == $val); @endphp
     <a href="{{ route("admin.tickets.index", ["status" => $val]) }}"
@@ -62,8 +62,8 @@
                 <td style="color:#666;">{{ $ticket->department->name ?? "N/A" }}</td>
                 <td><a href="{{ route("admin.tickets.show", $ticket) }}" style="color:#337ab7;text-decoration:none;font-weight:500;">{{ Str::limit($ticket->title, 55) }}</a></td>
                 <td>{{ $ticket->client?->full_name ?? $ticket->name ?? $ticket->email }}</td>
-                <td><span class="badge {{ $priorityBadge }}">{{ __('admin.tickets.priority_' . strtolower($ticket->priority ?? ''), ucfirst($ticket->priority ?? '')) }}</span></td>
-                <td><span class="badge {{ $statusBadge }}">{{ __('admin.tickets.status_' . str_replace([' ', '-'], '_', strtolower($ticket->status ?? '')), ucfirst($ticket->status ?? '')) }}</span></td>
+                <td><span class="badge {{ $priorityBadge }}">{{ __('common.priority.' . strtolower($ticket->priority ?? 'medium')) }}</span></td>
+                <td><span class="badge {{ $statusBadge }}">{{ __('common.status.' . str_replace([' ', '-'], '_', strtolower($ticket->status ?? 'open'))) }}</span></td>
                 <td style="color:#666;font-size:12px;">{{ $ticket->last_reply?->diffForHumans() ?? "-" }}</td>
             </tr>
             @empty

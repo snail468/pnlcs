@@ -3039,4 +3039,9 @@ return [
     'affiliates.pay_percentage' => 'Percentage',
     'affiliates.pay_fixed' => 'Fixed Amount',
     'ticket_spam.content_placeholder' => 'e.g. @spammail.com or casino',
+    'ticket_spam.email_pattern' => 'Email Pattern',
+    'ticket_spam.keyword' => 'Keyword',
+    'clients.deleted_client' => 'Deleted Client',
+    'quotes.add_item' => 'Add Item',
 ];
+

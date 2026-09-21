@@ -7,11 +7,11 @@
 </div>
 <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
     @foreach([
-        '' => __('admin.quotes.status_all', '全部'),
-        'Draft' => __('admin.quotes.status_draft', '草稿'),
-        'Sent' => __('admin.quotes.status_sent', '已发送'),
-        'Accepted' => __('admin.quotes.status_accepted', '已接受'),
-        'Declined' => __('admin.quotes.status_declined', '已拒绝')
+        '' => __('common.form.all'),
+        'Draft' => __('common.status.draft'),
+        'Sent' => __('common.status.sent'),
+        'Accepted' => __('common.status.accepted'),
+        'Declined' => __('common.status.declined')
     ] as $val => $label)
     <a href="{{ route('admin.quotes.index', ['status'=>$val,'search'=>request('search')]) }}"
        class="btn btn-sm {{ request('status')==$val ? 'btn-primary' : 'btn-default' }}">{{ $label }}</a>
@@ -39,7 +39,7 @@
                 <td style="font-size:12px;color:#777;">{{ \Carbon\Carbon::parse($quote->date)->format(date_fmt()) }}</td>
                 <td style="font-size:12px;color:#777;">{{ \Carbon\Carbon::parse($quote->valid_until)->format(date_fmt()) }}</td>
                 <td style="text-align:right;font-weight:600;">{{ money_fmt($quote->total) }}</td>
-                <td><span class="{{ $badgeClass }}">{{ __('admin.quotes.status_' . strtolower($quote->status), $quote->status) }}</span></td>
+                <td><span class="{{ $badgeClass }}">{{ __('common.status.' . strtolower($quote->status)) }}</span></td>
                 <td>
                     <div style="display:flex;gap:4px;">
                         <a href="{{ route('admin.quotes.show', $quote) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>

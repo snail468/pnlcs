@@ -5,13 +5,13 @@
     <div>
         <h1 style="font-family:monospace;font-size:22px;">{{ $domain->domain }}</h1>
         <div style="font-size:13px;color:#777;margin-top:3px;">
-            {{ __('admin.domains.type_' . strtolower($domain->type), ucfirst($domain->type)) }} &mdash; {{ __('admin.domains.registrar') }}: {{ ucfirst($domain->registrar ?? 'N/A') }}
+            {{ __('admin.domains.type_' . strtolower($domain->type)) }} &mdash; {{ __('admin.domains.registrar') }}: {{ ucfirst($domain->registrar ?? 'N/A') }}
             @if($domain->client) &mdash; <a href="{{ route('admin.clients.show', $domain->client_id) }}" style="color:#337ab7;">{{ $domain->client->full_name }}</a>@endif
         </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
         @php $badgeClass = match(strtolower($domain->status)) { 'active'=>'badge-active', 'pending'=>'badge-pending', 'expired'=>'badge-overdue', 'grace'=>'badge-pending', 'redemption'=>'badge-overdue', default=>'badge-cancelled' }; @endphp
-        <span class="{{ $badgeClass }}">{{ __('common.status.' . strtolower($domain->status), ucfirst($domain->status)) }}</span>
+        <span class="{{ $badgeClass }}">{{ __('common.status.' . strtolower($domain->status)) }}</span>
         <a href="{{ route('admin.domains.index') }}" class="btn btn-default btn-sm">&larr; {{ __('admin.domains.back') }}</a>
     </div>
 </div>

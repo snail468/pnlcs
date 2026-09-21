@@ -21,7 +21,7 @@
                 <select name="status" class="form-control" style="width:auto;">
                     <option value="">{{ __('common.misc.all_statuses') }}</option>
                     @foreach($statuses as $s)
-                    <option value="{{ $s }}" {{ request("status") == $s ? "selected" : "" }}>{{ __('common.status.' . strtolower($s), ucwords(str_replace("_", " ", $s))) }}</option>
+                    <option value="{{ $s }}" {{ request("status") == $s ? "selected" : "" }}>{{ __('common.status.' . strtolower($s)) }}</option>
                     @endforeach
                 </select>
             </div>
@@ -92,10 +92,10 @@
                 <td style="color:#666;">{{ $domain->registration_date?->format(date_fmt()) ?? "-" }}</td>
                 <td style="color:{{ $expired ? "#c43c35" : ($expirySoon ? "#d68100" : "#666") }};font-weight:{{ ($expired || $expirySoon) ? "600" : "400" }};">
                     {{ $domain->expiry_date?->format(date_fmt()) ?? "-" }}
-                    @if($expirySoon) <small style="font-size:11px;">({{ __('admin.domains.soon', '即将到期') }})</small> @endif
-                    @if($expired) <small style="font-size:11px;">({{ __('admin.domains.expired_tag', '已到期') }})</small> @endif
+                    @if($expirySoon) <small style="font-size:11px;">({{ __('admin.domains.soon') }})</small> @endif
+                    @if($expired) <small style="font-size:11px;">({{ __('admin.domains.expired_tag') }})</small> @endif
                 </td>
-                <td><span class="badge {{ $badgeClass }}">{{ __('common.status.' . strtolower($domain->status ?? ''), ucfirst($domain->status ?? '')) }}</span></td>
+                <td><span class="badge {{ $badgeClass }}">{{ $domain->status ? __('common.status.' . strtolower($domain->status)) : '-' }}</span></td>
                 <td>
                     <a href="{{ route("admin.domains.show", $domain) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>
                 </td>

@@ -27,7 +27,7 @@
             <div class="card">
                 <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
                     <strong>{{ __('admin.quotes.line_items') }}</strong>
-                    <button type="button" @click="addItem()" class="btn btn-default btn-xs">+ {{ __('admin.quotes.add_item', '添加明细项') }}</button>
+                    <button type="button" @click="addItem()" class="btn btn-default btn-xs">+ {{ __('admin.quotes.add_item') }}</button>
                 </div>
                 <div class="card-body" style="padding:0;">
                     <table style="width:100%;border-collapse:collapse;font-size:13px;">

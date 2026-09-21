@@ -9,12 +9,12 @@
 <!-- Status Filter Tabs -->
 <div style="margin-bottom:16px;border-bottom:1px solid #ddd;display:flex;gap:0;flex-wrap:wrap;">
     @foreach([
-        "" => __('admin.services.status_all', '全部'),
-        "active" => __('admin.services.status_active', '已激活'),
-        "suspended" => __('admin.services.status_suspended', '已暂停'),
-        "terminated" => __('admin.services.status_terminated', '已终止'),
-        "pending" => __('admin.services.status_pending', '待审核'),
-        "cancelled" => __('admin.services.status_cancelled', '已取消')
+        "" => __('common.form.all'),
+        "active" => __('common.status.active'),
+        "suspended" => __('common.status.suspended'),
+        "terminated" => __('common.status.terminated'),
+        "pending" => __('common.status.pending'),
+        "cancelled" => __('common.status.cancelled')
     ] as $val => $label)
     @php $isActive = (request("status","") == $val); @endphp
     <a href="{{ route("admin.services.index", ["status" => $val]) }}"
@@ -61,10 +61,10 @@
                     @else N/A @endif
                 </td>
                 <td style="font-family:monospace;font-size:12px;color:#666;">{{ $service->domain ?? "-" }}</td>
-                <td style="color:#666;">{{ $service->billing_cycle ? __('client.cart.cycle_' . strtolower($service->billing_cycle), ucfirst($service->billing_cycle)) : "-" }}</td>
+                <td style="color:#666;">{{ $service->billing_cycle ? __('client.cart.cycle_' . strtolower($service->billing_cycle)) : "-" }}</td>
                 <td style="text-align:right;font-weight:500;">{{ money_fmt($service->amount) }}</td>
                 <td style="color:#666;">{{ $service->next_due_date?->format(date_fmt()) ?? "-" }}</td>
-                <td><span class="badge {{ $badgeClass }}">{{ __('common.status.' . strtolower($service->status ?? ''), ucfirst($service->status ?? '')) }}</span></td>
+                <td><span class="badge {{ $badgeClass }}">{{ $service->status ? __('common.status.' . strtolower($service->status)) : '-' }}</span></td>
                 <td>
                     <a href="{{ route("admin.services.show", $service) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>
                 </td>

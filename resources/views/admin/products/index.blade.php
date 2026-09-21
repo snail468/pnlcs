@@ -14,7 +14,7 @@
 <div class="card" style="margin-bottom:15px;">
     <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
         <strong>{{ $group->name }}</strong>
-        <span style="font-size:12px;color:#777;">{{ $group->products->count() }} {{ __('admin.products.unit_product', '个产品') }}@if($group->headline) &mdash; {{ $group->headline }}@endif</span>
+        <span style="font-size:12px;color:#777;">{{ $group->products->count() }} {{ __('admin.products.unit_product') }}@if($group->headline) &mdash; {{ $group->headline }}@endif</span>
     </div>
     @if($group->products->count() > 0)
     <table class="data-table">
@@ -26,8 +26,8 @@
                 <a href="{{ route('admin.products.edit', $product) }}" style="color:#337ab7;font-weight:600;">{{ $product->name }}</a>
                 @if($product->is_featured) <span style="background:#fcf8e3;color:#8a6d3b;padding:1px 5px;border-radius:3px;font-size:11px;margin-left:4px;">{{ __('admin.products.featured') }}</span>@endif
             </td>
-            <td>{{ __('admin.products.type_' . $product->type, ucfirst($product->type)) }}</td>
-            <td>{{ __('admin.products.pay_' . $product->pay_type, ucfirst($product->pay_type)) }}</td>
+            <td>{{ __('admin.products.type_' . $product->type) }}</td>
+            <td>{{ __('admin.products.pay_' . $product->pay_type) }}</td>
             <td>
                 @if($product->hidden)<span class="badge-suspended">{{ __('admin.products.hidden') }}</span>
                 @elseif($product->retired)<span class="badge-terminated">{{ __('admin.products.retired') }}</span>
@@ -98,7 +98,7 @@
             <div style="padding:20px;">
                 <div class="form-group">
                     <label class="form-label">{{ __('admin.products.product_name') }}</label>
-                    <input type="text" name="name" id="cf-name" required class="form-control" placeholder="{{ __('admin.products.catalog_name_placeholder', '如：IT 技术支持服务') }}">
+                    <input type="text" name="name" id="cf-name" required class="form-control" placeholder="{{ __('admin.products.catalog_name_placeholder') }}">
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
@@ -107,7 +107,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">{{ __('admin.products.unit') }}</label>
-                        <input type="text" name="unit" id="cf-unit" class="form-control" placeholder="{{ __('admin.products.catalog_unit_placeholder', '件 / 小时 / 次') }}">
+                        <input type="text" name="unit" id="cf-unit" class="form-control" placeholder="{{ __('admin.products.catalog_unit_placeholder') }}">
                     </div>
                 </div>
                 <div class="form-group">

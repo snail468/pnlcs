@@ -1520,4 +1520,8 @@ return [
     // Added for 100% complete localization
     'services.soon' => '即将推出',
     'payment_methods.ending_in' => '尾号为 :last4',
+    'cart.cycle_free' => '免费',
+    'cart.cycle_onetime' => '一次性',
+    'cart.cycle_one_time' => '一次性',
 ];
+

@@ -3057,4 +3057,9 @@ return [
     'affiliates.pay_percentage' => '百分比佣金',
     'affiliates.pay_fixed' => '固定金额',
     'ticket_spam.content_placeholder' => '例如：@spammail.com 或 casino',
+    'ticket_spam.email_pattern' => '邮箱规则',
+    'ticket_spam.keyword' => '关键词',
+    'clients.deleted_client' => '已删除客户',
+    'quotes.add_item' => '添加明细项',
 ];
+

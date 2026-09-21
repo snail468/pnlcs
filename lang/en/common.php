@@ -326,4 +326,7 @@ return [
 
     // Added for 100% complete localization
     'status.redemption' => 'Redemption',
+    'status.all' => 'All',
+    'all' => 'All',
 ];
+

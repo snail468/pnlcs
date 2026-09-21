@@ -1268,4 +1268,14 @@ return [
     // Added for 100% complete localization
     'services.soon' => 'Soon',
     'payment_methods.ending_in' => 'ending :last4',
+    'hosting.databases.title' => 'Databases',
+    'hosting.databases.subtitle' => 'MySQL databases & users',
+    'hosting.ftp.title' => 'FTP Accounts',
+    'hosting.ftp.subtitle' => 'Manage FTP access',
+    'hosting.subdomains.title' => 'Subdomains',
+    'hosting.subdomains.subtitle' => 'Create subdomains',
+    'cart.cycle_free' => 'Free',
+    'cart.cycle_onetime' => 'One Time',
+    'cart.cycle_one_time' => 'One Time',
 ];
+

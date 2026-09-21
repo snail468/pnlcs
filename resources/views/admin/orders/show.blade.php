@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;">
-    <h1>{{ __('admin.orders.order_hash') }}{{ $order->order_num }} <span class="badge-{{ strtolower($order->status) }}" style="font-size:14px;vertical-align:middle;">{{ __('common.status.' . strtolower($order->status), ucfirst($order->status)) }}</span></h1>
+    <h1>{{ __('admin.orders.order_hash') }}{{ $order->order_num }} <span class="badge-{{ strtolower($order->status) }}" style="font-size:14px;vertical-align:middle;">{{ __('common.status.' . strtolower($order->status)) }}</span></h1>
     <a href="{{ route('admin.orders.index') }}" class="btn btn-default btn-sm">&larr; {{ __('admin.orders.back') }}</a>
 </div>
 <div style="display:grid;grid-template-columns:2fr 1fr;gap:15px;">
@@ -46,9 +46,9 @@
                         {{ $svc->domain ?? '&mdash;' }}
                         @endif
                     </td>
-                    <td>{{ __('client.cart.cycle_' . strtolower($svc->billing_cycle), ucfirst($svc->billing_cycle)) }}</td>
+                    <td>{{ $svc->billing_cycle ? __('client.cart.cycle_' . strtolower($svc->billing_cycle)) : '-' }}</td>
                     <td style="text-align:right;font-family:monospace;">{{ money_fmt($svc->amount) }}</td>
-                    <td><span class="badge-{{ strtolower($svc->status) }}">{{ __('common.status.' . strtolower($svc->status), ucfirst($svc->status)) }}</span></td>
+                    <td><span class="badge-{{ strtolower($svc->status) }}">{{ __('common.status.' . strtolower($svc->status)) }}</span></td>
                 </tr>
                 @endforeach
                 </tbody>
@@ -65,9 +65,9 @@
                 @foreach($order->domains as $dom)
                 <tr>
                     <td style="font-family:monospace;font-weight:600;">{{ $dom->domain }}</td>
-                    <td>{{ __('admin.domains.type_' . strtolower($dom->type), ucfirst($dom->type)) }}</td>
+                    <td>{{ __('admin.domains.type_' . strtolower($dom->type)) }}</td>
                     <td>{{ $dom->expiry_date?->format(date_fmt()) ?? '&mdash;' }}</td>
-                    <td><span class="badge-{{ strtolower($dom->status) }}">{{ __('common.status.' . strtolower($dom->status), ucfirst($dom->status)) }}</span></td>
+                    <td><span class="badge-{{ strtolower($dom->status) }}">{{ __('common.status.' . strtolower($dom->status)) }}</span></td>
                 </tr>
                 @endforeach
                 </tbody>
@@ -97,7 +97,7 @@
             <div class="panel-heading panel-primary">{{ __('admin.orders.client_info') }}</div>
             <div class="panel-body">
                 <table style="width:100%;font-size:13px;border-collapse:collapse;">
-                    <tr><td style="padding:4px 0;color:#777;width:35%;">{{ __('admin.orders.name') }}</td><td style="padding:4px 0;"><a href="{{ $order->client ? route("admin.clients.show", $order->client) : "#" }}" style="color:#337ab7;font-weight:600;">{{ $order->client?->display_name ?? __('admin.clients.deleted_client', '已删除客户') }}</a></td></tr>
+                    <tr><td style="padding:4px 0;color:#777;width:35%;">{{ __('admin.orders.name') }}</td><td style="padding:4px 0;"><a href="{{ $order->client ? route("admin.clients.show", $order->client) : "#" }}" style="color:#337ab7;font-weight:600;">{{ $order->client?->display_name ?? __('admin.clients.deleted_client') }}</a></td></tr>
                     <tr><td style="padding:4px 0;color:#777;">{{ __('admin.orders.email') }}</td><td style="padding:4px 0;">{{ $order->client?->email ?? "-" }}</td></tr>
                     @if($order->client?->company_name)
                     <tr><td style="padding:4px 0;color:#777;">{{ __('admin.orders.company') }}</td><td style="padding:4px 0;">{{ $order->client?->company_name }}</td></tr>

@@ -9,11 +9,11 @@
 <!-- Status Filter Tabs -->
 <div style="margin-bottom:16px;border-bottom:1px solid #ddd;display:flex;gap:0;flex-wrap:wrap;">
     @foreach([
-        "" => __('admin.orders.status_all', '全部'),
-        "pending" => __('admin.orders.status_pending', '待处理'),
-        "active" => __('admin.orders.status_active', '已激活'),
-        "fraud" => __('admin.orders.status_fraud', '欺诈/风险'),
-        "cancelled" => __('admin.orders.status_cancelled', '已取消')
+        "" => __('common.form.all'),
+        "pending" => __('common.status.pending'),
+        "active" => __('common.status.active'),
+        "fraud" => __('common.status.fraud'),
+        "cancelled" => __('common.status.cancelled')
     ] as $val => $label)
     @php $isActive = (request("status","") == $val); @endphp
     <a href="{{ route("admin.orders.index", ["status" => $val]) }}"
@@ -52,13 +52,13 @@
                 <td><a href="{{ route("admin.orders.show", $order) }}" style="color:#337ab7;text-decoration:none;font-family:monospace;">#{{ $order->order_num }}</a></td>
                 <td>
                     @if($order->client)
-                    <a href="{{ route("admin.clients.show", $order->client_id) }}" style="color:#337ab7;text-decoration:none;">{{ $order->client?->full_name ?? __('admin.clients.deleted_client', '已删除客户') }}</a>
+                    <a href="{{ route("admin.clients.show", $order->client_id) }}" style="color:#337ab7;text-decoration:none;">{{ $order->client?->full_name ?? __('admin.clients.deleted_client') }}</a>
                     @else N/A @endif
                 </td>
                 <td style="color:#666;">{{ $order->date?->format(date_fmt()) ?? "-" }}</td>
                 <td style="text-align:right;font-weight:500;">{{ money_fmt($order->amount) }}</td>
                 <td style="color:#666;">{{ $order->payment_method ? payment_method_label((string) $order->payment_method) : "-" }}</td>
-                <td><span class="badge {{ $badgeClass }}">{{ __('common.status.' . strtolower($order->status ?? ''), ucfirst($order->status ?? '')) }}</span></td>
+                <td><span class="badge {{ $badgeClass }}">{{ $order->status ? __('common.status.' . strtolower($order->status)) : '-' }}</span></td>
                 <td>
                     <a href="{{ route("admin.orders.show", $order) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>
                 </td>
