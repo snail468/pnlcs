@@ -254,8 +254,17 @@ class InstallController extends Controller
     public function app()
     {
         try {
+            $defaultUrl = config('app.url', 'http://localhost');
+            try {
+                $reqUrl = request()->getSchemeAndHttpHost();
+                $clean = preg_replace('#:(80|443)$#', '', $reqUrl);
+                if (! empty($clean) && filter_var($clean, FILTER_VALIDATE_URL)) {
+                    $defaultUrl = $clean;
+                }
+            } catch (\Throwable $e) {}
+
             return view('install.app', [
-                'app_url' => config('app.url', 'http://localhost'),
+                'app_url' => $defaultUrl,
                 'app_name' => config('app.name', 'PNLCS'),
                 'app_locale' => config('app.locale', 'zh'),
             ]);
