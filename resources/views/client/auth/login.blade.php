@@ -51,7 +51,7 @@
                 <div class="alert">{{ $errors->first() }}</div>
             @endif
 
-            <form method="POST" action="{{ route('client.login.submit') }}">
+            <form method="POST" action="/client/login">
                 @csrf
                 <div class="form-group">
                     <label class="form-label" for="email">{{ __('common.form.email_address') }}</label>

@@ -15,7 +15,7 @@ class AdminAuthenticate
                 return response()->json(["message" => "Unauthenticated."], 401);
             }
 
-            return redirect()->route("admin.login");
+            return redirect('/admin/login');
         }
 
         $admin = auth("admin")->user();
@@ -23,7 +23,7 @@ class AdminAuthenticate
         if ($admin->is_disabled) {
             auth("admin")->logout();
 
-            return redirect()->route("admin.login")
+            return redirect('/admin/login')
                 ->withErrors(["username" => __("auth.disabled")]);
         }
 

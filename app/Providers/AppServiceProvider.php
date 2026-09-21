@@ -51,6 +51,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->useConfiguredDomainForConsoleLinks();
 
+        if (request()->isSecure() || str_contains(strtolower((string) request()->header('X-Forwarded-Proto')), 'https')) {
+            URL::forceScheme('https');
+        }
+
         // How many times the API will let someone try.
         //
         // The admin login form allows ten attempts a minute. The API accepts

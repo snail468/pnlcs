@@ -93,10 +93,10 @@ class AuthController extends Controller
                 session()->forget('2fa_verified');
                 session(['2fa_pending' => true]);
 
-                return redirect()->route('client.2fa.verify');
+                return redirect('/client/2fa');
             }
 
-            return redirect()->intended(route('client.home'));
+            return redirect()->intended('/client');
         }
 
         RateLimiter::hit($key, 900);
@@ -107,7 +107,7 @@ class AuthController extends Controller
     public function show2faVerify()
     {
         if (! Auth::check()) {
-            return redirect()->route('client.login');
+            return redirect('/client/login');
         }
 
         return view('client.auth.two-factor');

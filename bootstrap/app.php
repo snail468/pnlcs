@@ -37,12 +37,15 @@ return Application::configure(basePath: dirname(__DIR__))
         // "light", nothing worth protecting.
         $middleware->encryptCookies(except: ['pnlcs_theme']);
 
-        // Behind Panelica reverse proxy (Docker): trust the forwarded scheme
-        // and host so asset()/route()/Vite URLs match the domain the request
-        // actually arrived on, whatever it is. Without this a page served over
-        // https emits http asset URLs and the browser blocks them as mixed
-        // content. This is domain-agnostic: no per-domain APP_URL to maintain.
-        $middleware->trustProxies(at: '*');
+        // Behind reverse proxy (Docker): trust forwarded scheme, host and IP
+        // Do NOT trust X-Forwarded-Port so Symfony never appends bogus :80 to https URLs.
+        $middleware->trustProxies(
+            at: '*',
+            headers: \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO |
+                     \Illuminate\Http\Request::HEADER_X_FORWARDED_PREFIX
+        );
         $middleware->prependToGroup('web', RedirectToInstaller::class);
         $middleware->appendToGroup('web', AffiliateTracking::class);
         $middleware->appendToGroup('web', SetLocale::class);

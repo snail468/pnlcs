@@ -20,7 +20,7 @@ class AdminTwoFactorVerify
         if ($admin->second_factor_type && $admin->second_factor_secret) {
             if (!session('admin_2fa_verified')) {
                 session(['admin_2fa_intended' => $request->url()]);
-                return redirect()->route('admin.2fa.verify');
+                return redirect('/admin/2fa');
             }
         }
 

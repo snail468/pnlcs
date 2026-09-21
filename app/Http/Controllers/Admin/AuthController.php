@@ -64,10 +64,10 @@ class AuthController extends Controller
                 // invalidates the session; a re-login does not.
                 session()->forget('admin_2fa_verified');
                 session(['admin_2fa_pending' => true]);
-                return redirect()->route('admin.2fa.verify');
+                return redirect('/admin/2fa');
             }
 
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->intended('/admin');
         }
 
         RateLimiter::hit($key, 900);
@@ -77,7 +77,7 @@ class AuthController extends Controller
     public function show2faVerify()
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login');
+            return redirect('/admin/login');
         }
 
         return view('admin.auth.two-factor');
@@ -98,7 +98,7 @@ class AuthController extends Controller
         if ($twoFactor->verify($admin->second_factor_secret, $code)) {
             session(['admin_2fa_verified' => true]);
             session()->forget('admin_2fa_pending');
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->intended('/admin');
         }
 
         // Try backup code
@@ -109,7 +109,7 @@ class AuthController extends Controller
                 $admin->update(['backup_codes' => $result['remaining']]);
                 session(['admin_2fa_verified' => true]);
                 session()->forget('admin_2fa_pending');
-                return redirect()->intended(route('admin.dashboard'));
+                return redirect()->intended('/admin');
             }
         }
 
@@ -179,6 +179,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect('/admin/login');
     }
 }
