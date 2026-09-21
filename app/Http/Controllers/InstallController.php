@@ -77,7 +77,7 @@ class InstallController extends Controller
         // If migrations already applied (Docker case), skip DB step.
         try {
             if (Schema::hasTable('migrations')) {
-                return redirect(request()->getSchemeAndHttpHost().'/install/admin');
+                return redirect()->away('/install/admin');
             }
         } catch (\Throwable $e) { /* DB not configured yet */
         }
@@ -151,7 +151,7 @@ class InstallController extends Controller
 
             Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
 
-            return redirect($request->getSchemeAndHttpHost().'/install/admin');
+            return redirect()->away('/install/admin');
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Migration error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withInput()->withErrors(['migrate' => '数据库迁移或配置保存失败: '.$e->getMessage()]);
@@ -243,7 +243,7 @@ class InstallController extends Controller
                 'install.admin_id' => $admin->id,
             ]);
 
-            return redirect($request->getSchemeAndHttpHost().'/install/app');
+            return redirect()->away('/install/app');
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('saveAdmin failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withInput()->withErrors(['admin' => '创建管理员失败: '.$e->getMessage()]);
@@ -301,8 +301,8 @@ class InstallController extends Controller
             @file_put_contents(storage_path('installed.lock'), date('c'));
             $request->session()->forget('install.in_progress');
 
-            // Use current request's scheme+host (bypass stale URL generator).
-            return redirect($request->getSchemeAndHttpHost().'/install/finish');
+            // Use relative path redirect to preserve current scheme, host and port.
+            return redirect()->away('/install/finish');
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('saveApp failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return back()->withInput()->withErrors(['app' => '保存配置失败: '.$e->getMessage()]);
