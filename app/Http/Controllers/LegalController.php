@@ -32,69 +32,82 @@ class LegalController extends Controller
      */
     public const DOCUMENTS = [
         'terms' => [
+            'zh' => ['服务条款与服务协议', '在您使用我们提供的各项服务时双方的权利、责任与义务。'],
             'tr' => ['Kullanım Koşulları ve Hizmet Sözleşmesi', 'Hizmetlerimizi kullanırken sizin ve bizim yükümlülüklerimiz.'],
             'en' => ['Terms of Service', 'The obligations on you and on us when you use our services.'],
             'icon' => 'ri-file-text-line',
         ],
         'aup' => [
+            'zh' => ['可接受使用政策 (AUP)', '明确服务器与网络资源的合法合规使用规范及禁止行为清单。'],
             'tr' => ['Kabul Edilebilir Kullanım Politikası', 'Sunucularımızda neyin yapılabileceği, neyin yapılamayacağı.'],
             'en' => ['Acceptable Use Policy', 'What may and may not be done on our servers.'],
             'icon' => 'ri-shield-check-line',
         ],
         'privacy' => [
+            'zh' => ['隐私权保护政策', '说明我们收集、处理和保护您的哪些个人数据，以及留存时限与用途。'],
             'tr' => ['Gizlilik Politikası', 'Hangi kişisel verinizi, neden ve ne kadar süreyle işliyoruz.'],
             'en' => ['Privacy Policy', 'What personal data we process, why, and for how long.'],
             'icon' => 'ri-lock-line',
         ],
         'cookies' => [
+            'zh' => ['Cookie 政策', '本站所使用的 Cookie 技术说明及您的偏好管理方式。'],
             'tr' => ['Çerez Politikası', 'Sitede kullanılan çerezler ve bunları nasıl yönetebileceğiniz.'],
             'en' => ['Cookie Policy', 'The cookies this site sets and how you can control them.'],
             'icon' => 'ri-cake-2-line',
         ],
         'refund' => [
+            'zh' => ['取消与退款政策', '各项主机与域名服务的退款条件、结算周期与退款申请流程。'],
             'tr' => ['İptal, Cayma ve İade Politikası', 'Para iadesi koşulları ve 14 günlük cayma hakkı.'],
             'en' => ['Cancellation and Refund Policy', 'Refund conditions and the 14-day right of withdrawal.'],
             'icon' => 'ri-refund-2-line',
         ],
         'sla' => [
+            'zh' => ['服务等级协议 (SLA)', '99.9% 运行时间连通率承诺及服务未达标时的信用额度补偿标准。'],
             'tr' => ['Hizmet Seviyesi Taahhüdü (SLA)', 'Çalışma süresi taahhüdümüz ve tutmazsa ne olacağı.'],
             'en' => ['Service Level Agreement', 'Our uptime commitment and what happens if we miss it.'],
             'icon' => 'ri-timer-line',
         ],
         'dpa' => [
+            'zh' => ['数据处理补充协议 (DPA)', '作为数据处理者在数据合规与保护方面承担的法定义务与技术安全保障。'],
             'tr' => ['Veri İşleme Sözleşmesi (DPA)', 'KVKK ve GDPR kapsamında veri işleyen sıfatıyla taahhütlerimiz.'],
             'en' => ['Data Processing Addendum', 'Our commitments as a processor under GDPR and Turkish data protection law.'],
             'icon' => 'ri-database-2-line',
         ],
         'abuse' => [
+            'zh' => ['违规滥用与侵权投诉政策', '如何向平台提交侵权投诉或恶意活动举报，处理流程与处置时限。'],
             'tr' => ['Kötüye Kullanım ve Telif İhlali Bildirimi', 'Şikâyet nasıl yapılır, nasıl işlenir, ne kadar sürede sonuçlanır.'],
             'en' => ['Abuse and Copyright (DMCA) Policy', 'How to file a complaint, how we handle it, and how long it takes.'],
             'icon' => 'ri-alarm-warning-line',
         ],
         'domain' => [
+            'zh' => ['域名注册与转移协议', 'ICANN 规则、WHOIS 隐私保护、续费宽限期及域名争议处理规范。'],
             'tr' => ['Alan Adı Kayıt Sözleşmesi', 'ICANN kuralları, WHOIS, yenileme ve alan adı uyuşmazlıkları.'],
             'en' => ['Domain Registration Agreement', 'ICANN rules, WHOIS, renewals and domain disputes.'],
             'icon' => 'ri-global-line',
         ],
         'kvkk' => [
+            'zh' => ['土耳其数据保护条例 (KVKK)', '依据土耳其第 6698 号法律规定的数据控制者告知事项。'],
             'tr' => ['KVKK Aydınlatma Metni', '6698 sayılı Kanun kapsamında veri sorumlusu aydınlatma yükümlülüğü.'],
             'en' => ['Turkish Data Protection Notice (KVKK)', 'The controller disclosure required by Turkish Law No. 6698.'],
             'icon' => 'ri-scales-3-line',
             'tr_only' => true,
         ],
         'distance-sales' => [
+            'zh' => ['远程销售合同', '依据土耳其消费者保护法规定的标准销售合同。'],
             'tr' => ['Mesafeli Satış Sözleşmesi', '6502 sayılı Tüketicinin Korunması Hakkında Kanun uyarınca zorunlu sözleşme.'],
             'en' => ['Distance Sales Agreement', 'The contract required by Turkish Consumer Protection Law No. 6502.'],
             'icon' => 'ri-contract-line',
             'tr_only' => true,
         ],
         'pre-information' => [
+            'zh' => ['签约前信息告知书', '订单支付前依法向消费者提供的预告知信息表。'],
             'tr' => ['Ön Bilgilendirme Formu', 'Sipariş öncesi yasal olarak verilmesi gereken bilgiler.'],
             'en' => ['Pre-Contractual Information Form', 'The information Turkish law requires before an order is placed.'],
             'icon' => 'ri-information-line',
             'tr_only' => true,
         ],
         'yer-saglayici' => [
+            'zh' => ['主机服务商资质公示', '符合监管机构要求的主机服务提供商资质备案信息。'],
             'tr' => ['Yer Sağlayıcı Bilgileri', '5651 sayılı Kanun kapsamındaki BTK yer sağlayıcılık bildirimimiz ve doğrulama bağlantısı.'],
             'en' => ['Hosting Provider Registration', 'Our hosting provider notification to the Turkish ICTA under Law No. 5651.'],
             'icon' => 'ri-verified-badge-line',
@@ -167,7 +180,11 @@ class LegalController extends Controller
      */
     private function locale(): string
     {
-        return app()->getLocale() === 'tr' ? 'tr' : 'en';
+        $lang = app()->getLocale();
+        if ($lang === 'zh') {
+            return 'zh';
+        }
+        return $lang === 'tr' ? 'tr' : 'en';
     }
 
     /**
@@ -202,6 +219,10 @@ class LegalController extends Controller
 
         if ($legal === '' || $legal === $brand) {
             return $brand;
+        }
+
+        if (app()->getLocale() === 'zh') {
+            return $legal . '（经营品牌：“' . $brand . '”）';
         }
 
         return $tr

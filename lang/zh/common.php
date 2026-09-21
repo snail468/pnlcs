@@ -217,6 +217,7 @@ return [
         'expired' => '已过期',
         'failed' => '失败',
         'fraud' => '欺诈',
+        'grace' => '宽限期',
         'in_progress' => '处理中',
         'inactive' => '未启用',
         'no' => '否',

@@ -41,6 +41,54 @@ class TranslationSeeder extends Seeder
         if ($this->command) {
             $this->command->info("Seeded {$count} English translation keys.");
         }
+
+        // Seed Chinese translation files into dynamic_translations
+        $zhDir = function_exists('lang_path') ? lang_path('zh') : resource_path('lang/zh');
+        if (is_dir($zhDir)) {
+            $zhRows = [];
+            foreach (glob($zhDir . '/*.php') as $file) {
+                $group = basename($file, '.php');
+                $groupTranslations = include $file;
+                if (is_array($groupTranslations)) {
+                    $this->flattenTranslations($groupTranslations, '', $group, 'zh', $zhRows, $now);
+                }
+            }
+            foreach (array_chunk($zhRows, 200) as $chunk) {
+                DB::table('dynamic_translations')->upsert(
+                    $chunk,
+                    ['language', 'group', 'key'],
+                    ['value', 'is_auto_translated', 'is_reviewed', 'updated_at']
+                );
+            }
+            $zhCount = count($zhRows);
+            if ($this->command) {
+                $this->command->info("Seeded {$zhCount} Chinese translation keys.");
+            }
+        }
+
+        // Flush all translation caches
+        \App\Translation\TranslationCacheManager::flush();
+    }
+
+    private function flattenTranslations(array $array, string $prefix, string $group, string $lang, array &$rows, $now): void
+    {
+        foreach ($array as $key => $value) {
+            $fullKey = $prefix === '' ? $key : "{$prefix}.{$key}";
+            if (is_array($value)) {
+                $this->flattenTranslations($value, $fullKey, $group, $lang, $rows, $now);
+            } else {
+                $rows[] = [
+                    'language' => $lang,
+                    'group' => $group,
+                    'key' => $fullKey,
+                    'value' => (string) $value,
+                    'is_auto_translated' => 0,
+                    'is_reviewed' => 1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+        }
     }
 
     private function getTranslations(): array

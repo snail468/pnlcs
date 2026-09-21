@@ -75,7 +75,7 @@
                 <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:8px;">
                     @foreach(['monthly','quarterly','semiannually','annually','biennially','triennially'] as $cycle)
                     <div>
-                        <label class="form-label" style="text-transform:capitalize;font-size:11px;">{{ $cycle }}</label>
+                        <label class="form-label" style="text-transform:capitalize;font-size:11px;">{{ __('client.cart.cycle_' . $cycle) }}</label>
                         <input type="number" step="0.01" name="pricing[{{ $currency->id }}][{{ $cycle }}]" value="{{ $p ? $p->$cycle : -1 }}" class="form-control" style="font-size:12px;">
                     </div>
                     @endforeach
@@ -83,7 +83,7 @@
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
                     @foreach(['monthly_setup','quarterly_setup','semiannually_setup','annually_setup'] as $setup)
                     <div>
-                        <label class="form-label" style="font-size:11px;">{{ str_replace('_', ' ', ucfirst($setup)) }}</label>
+                        <label class="form-label" style="font-size:11px;">{{ __('client.cart.cycle_' . str_replace('_setup', '', $setup)) }} {{ __('admin.products.setup_fee') }}</label>
                         <input type="number" step="0.01" name="pricing[{{ $currency->id }}][{{ $setup }}]" value="{{ $p ? $p->$setup : 0 }}" class="form-control" style="font-size:12px;">
                     </div>
                     @endforeach
@@ -95,18 +95,18 @@
 
     @php $cfg = is_string($product->config_options) ? (json_decode($product->config_options, true) ?: []) : ($product->config_options ?? []); @endphp
     <div class="card" style="margin-bottom:15px;">
-        <div class="card-header"><strong>Panelica Resources</strong> <span style="font-size:11px;color:#888;">&mdash; enforced cgroups/quota limits (full panel parity)</span></div>
+        <div class="card-header"><strong>{{ __('admin.products.panelica_resources') }}</strong> <span style="font-size:11px;color:#888;">&mdash; {{ __('admin.products.panelica_resources_desc') }}</span></div>
         <div class="card-body">
             <input type="hidden" name="res_section" value="1">
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:12px;">
                 <input type="checkbox" name="res_managed" value="1" {{ !empty($cfg['res_managed']) ? 'checked' : '' }}>
-                <strong>Managed mode</strong> &mdash; build a matching panel plan from the limits below on provisioning
+                <strong>{{ __('admin.products.res_managed') }}</strong> &mdash; {{ __('admin.products.res_managed_desc') }}
             </label>
             <div class="form-group" style="margin-bottom:14px;">
-                <label class="form-label" style="font-size:12px;">Or use an existing panel plan ID (leave managed unchecked)</label>
+                <label class="form-label" style="font-size:12px;">{{ __('admin.products.panelica_plan_id') }}</label>
                 @if(!empty($panelicaPlans))
                 <select name="panelica_plan_id" class="form-control" style="font-size:12px;">
-                    <option value="">&mdash; none (use managed limits below) &mdash;</option>
+                    <option value="">{{ __('admin.products.panelica_plan_none') }}</option>
                     @foreach($panelicaPlans as $pl)
                     <option value="{{ $pl['id'] ?? '' }}" {{ (string)($cfg['panelica_plan_id'] ?? '') === (string)($pl['id'] ?? '') ? 'selected' : '' }}>{{ $pl['name'] ?? ($pl['id'] ?? 'plan') }}</option>
                     @endforeach
@@ -116,10 +116,10 @@
                 @endif
             </div>
             <div class="form-group" style="margin-bottom:14px;">
-                <label class="form-label" style="font-size:12px;">App Hosting &mdash; install this app on provisioning and serve it on the customer's domain</label>
+                <label class="form-label" style="font-size:12px;">{{ __('admin.products.app_hosting') }} &mdash; {{ __('admin.products.app_hosting_desc') }}</label>
                 @if(!empty($panelicaTemplates))
                 <select name="panelica_app_template" class="form-control" style="font-size:12px;">
-                    <option value="">&mdash; none (regular web hosting) &mdash;</option>
+                    <option value="">{{ __('admin.products.app_hosting_none') }}</option>
                     @foreach($panelicaTemplates as $tpl)
                     <option value="{{ $tpl['slug'] }}" {{ (string)($cfg['panelica_app_template'] ?? '') === $tpl['slug'] ? 'selected' : '' }}>{{ $tpl['name'] }}</option>
                     @endforeach
@@ -127,29 +127,38 @@
                 @else
                 <input type="text" name="panelica_app_template" value="{{ $cfg['panelica_app_template'] ?? '' }}" class="form-control" style="font-size:12px;" placeholder="wordpress">
                 @endif
-                <div style="font-size:11px;color:#888;margin-top:4px;">Needs Max Containers of at least 1 below. If the app cannot be installed the order fails and the account is rolled back.</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;">{{ __('admin.products.app_hosting_hint') }}</div>
             </div>
             {{-- Selling ninety-eight apps as ninety-eight products does not
                  scale, so one product can let the customer pick instead. --}}
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:12px;">
                 <input type="checkbox" name="panelica_app_choose" value="1" {{ !empty($cfg['panelica_app_choose']) ? 'checked' : '' }}>
-                <strong>Customer picks the app</strong> &mdash; the order form shows the app catalogue instead of installing a fixed one
+                <strong>{{ __('admin.products.app_choose') }}</strong> &mdash; {{ __('admin.products.app_choose_desc') }}
             </label>
             <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:12px;">
                 <input type="checkbox" name="panelica_container_plan" value="1" {{ !empty($cfg['panelica_container_plan']) ? 'checked' : '' }}>
-                <strong>Container plan</strong> &mdash; sells container resources, not a website: provisions without a domain and shows only the Apps tab
+                <strong>{{ __('admin.products.container_plan') }}</strong> &mdash; {{ __('admin.products.container_plan_desc') }}
             </label>
             @php $numFields = [
-                'res_cpu_percent'=>['CPU Limit (%) &mdash; 100 = 1 core',100],'res_memory_mb'=>['RAM (MB)',1024],
-                'res_inode_quota'=>['Inode Quota (-1 = unlimited)',-1],'res_iops'=>['IOPS (0 = unlimited)',0],
-                'res_io_mbs'=>['Disk I/O (MB/s)',0],'res_disk_mb'=>['Disk (MB)',5120],
-                'res_bandwidth_mb'=>['Bandwidth (MB)',51200],'res_process_limit'=>['Max Processes',100],
-                'res_max_domains'=>['Max Websites',1],'res_max_subdomains'=>['Max Subdomains',10],
-                'res_max_email'=>['Max Email',10],'res_max_db'=>['Max Databases',5],
-                'res_max_ftp'=>['Max FTP',5],'res_max_cron'=>['Max Cron',5],
-                'res_max_containers'=>['Max Containers',0],'res_network_mbit'=>['Network (Mbit/s)',0],
-                'res_php_memory_mb'=>['PHP Memory (MB)',256],'res_php_exec'=>['PHP Exec (s)',30],
-                'res_php_upload'=>['PHP Upload (MB)',64],
+                'res_cpu_percent'    => [__('client.store.res_cpu_percent'), 100],
+                'res_memory_mb'      => [__('client.store.res_memory_mb'), 1024],
+                'res_inode_quota'    => [__('client.store.res_inode_quota'), -1],
+                'res_iops'           => [__('client.store.res_iops'), 0],
+                'res_io_mbs'         => [__('client.store.res_io_mbs'), 0],
+                'res_disk_mb'        => [__('client.store.res_disk_mb'), 5120],
+                'res_bandwidth_mb'   => [__('client.store.res_bandwidth_mb'), 51200],
+                'res_process_limit'  => [__('client.store.res_process_limit'), 100],
+                'res_max_domains'    => [__('client.store.res_max_domains'), 1],
+                'res_max_subdomains' => [__('client.store.res_max_subdomains'), 10],
+                'res_max_email'      => [__('client.store.res_max_email'), 10],
+                'res_max_db'         => [__('client.store.res_max_db'), 5],
+                'res_max_ftp'        => [__('client.store.res_max_ftp'), 5],
+                'res_max_cron'       => [__('client.store.res_max_cron'), 5],
+                'res_max_containers' => [__('client.store.res_max_containers'), 0],
+                'res_network_mbit'   => [__('client.store.res_network_mbit'), 0],
+                'res_php_memory_mb'  => [__('client.store.res_php_memory_mb'), 256],
+                'res_php_exec'       => [__('client.store.res_php_exec'), 30],
+                'res_php_upload'     => [__('client.store.res_php_upload'), 64],
             ]; @endphp
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
                 @foreach($numFields as $k => $meta)
@@ -159,29 +168,33 @@
                 </div>
                 @endforeach
                 <div>
-                    <label class="form-label" style="font-size:11px;">SSH Access</label>
+                    <label class="form-label" style="font-size:11px;">{{ __('admin.products.ssh_access') }}</label>
                     <select name="res_ssh_level" class="form-control" style="font-size:12px;">
-                        @foreach(['none','jailed','full'] as $o)<option value="{{ $o }}" {{ ($cfg['res_ssh_level'] ?? 'none')===$o?'selected':'' }}>{{ ucfirst($o) }}</option>@endforeach
+                        <option value="none" {{ ($cfg['res_ssh_level'] ?? 'none')==='none'?'selected':'' }}>{{ __('admin.products.ssh_none') }}</option>
+                        <option value="jailed" {{ ($cfg['res_ssh_level'] ?? 'none')==='jailed'?'selected':'' }}>{{ __('admin.products.ssh_jailed') }}</option>
+                        <option value="full" {{ ($cfg['res_ssh_level'] ?? 'none')==='full'?'selected':'' }}>{{ __('admin.products.ssh_full') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:11px;">Quota Mode</label>
+                    <label class="form-label" style="font-size:11px;">{{ __('admin.products.quota_mode') }}</label>
                     <select name="res_quota_mode" class="form-control" style="font-size:12px;">
-                        @foreach(['strict','monitor','oversell'] as $o)<option value="{{ $o }}" {{ ($cfg['res_quota_mode'] ?? 'strict')===$o?'selected':'' }}>{{ ucfirst($o) }}</option>@endforeach
+                        <option value="strict" {{ ($cfg['res_quota_mode'] ?? 'strict')==='strict'?'selected':'' }}>{{ __('admin.products.quota_strict') }}</option>
+                        <option value="monitor" {{ ($cfg['res_quota_mode'] ?? 'strict')==='monitor'?'selected':'' }}>{{ __('admin.products.quota_monitor') }}</option>
+                        <option value="oversell" {{ ($cfg['res_quota_mode'] ?? 'strict')==='oversell'?'selected':'' }}>{{ __('admin.products.quota_oversell') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:11px;">ModSecurity</label>
+                    <label class="form-label" style="font-size:11px;">{{ __('admin.products.modsec') }}</label>
                     <select name="res_modsec" class="form-control" style="font-size:12px;">
-                        <option value="on" {{ ($cfg['res_modsec'] ?? 'on')!=='off'?'selected':'' }}>On</option>
-                        <option value="off" {{ ($cfg['res_modsec'] ?? 'on')==='off'?'selected':'' }}>Off</option>
+                        <option value="on" {{ ($cfg['res_modsec'] ?? 'on')!=='off'?'selected':'' }}>{{ __('admin.products.on') }}</option>
+                        <option value="off" {{ ($cfg['res_modsec'] ?? 'on')==='off'?'selected':'' }}>{{ __('admin.products.off') }}</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:11px;">Backups</label>
+                    <label class="form-label" style="font-size:11px;">{{ __('admin.products.backup') }}</label>
                     <select name="res_backup" class="form-control" style="font-size:12px;">
-                        <option value="on" {{ ($cfg['res_backup'] ?? 'on')!=='off'?'selected':'' }}>On</option>
-                        <option value="off" {{ ($cfg['res_backup'] ?? 'on')==='off'?'selected':'' }}>Off</option>
+                        <option value="on" {{ ($cfg['res_backup'] ?? 'on')!=='off'?'selected':'' }}>{{ __('admin.products.on') }}</option>
+                        <option value="off" {{ ($cfg['res_backup'] ?? 'on')==='off'?'selected':'' }}>{{ __('admin.products.off') }}</option>
                     </select>
                 </div>
             </div>

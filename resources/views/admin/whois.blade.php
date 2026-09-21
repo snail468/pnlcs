@@ -37,7 +37,7 @@
 @if(!empty($result['parsed']))
 <div class="card" style="margin-bottom:24px;">
     <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-weight:600;"><i class="fas fa-info-circle" style="margin-right:6px;color:#1a4d80;"></i> Domain Information: {{ $result['domain'] }}</span>
+        <span style="font-weight:600;"><i class="fas fa-info-circle" style="margin-right:6px;color:#1a4d80;"></i> {{ __('admin.whois.domain_information') }}: {{ $result['domain'] }}</span>
         @if($result['available'] ?? false)
         <span class="badge-active">{{ __('admin.whois.available') }}</span>
         @else
@@ -65,7 +65,7 @@
 
 <div class="card">
     <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-weight:600;"><i class="fas fa-terminal" style="margin-right:6px;color:#64748b;"></i> Raw WHOIS Response</span>
+        <span style="font-weight:600;"><i class="fas fa-terminal" style="margin-right:6px;color:#64748b;"></i> {{ __('admin.whois.raw_response', 'WHOIS 原始返回报文') }}</span>
         <span style="font-size:12px;color:#94a3b8;font-family:monospace;">{{ $result['server'] ?? '' }}</span>
     </div>
     <div class="card-body" style="padding:0;">

@@ -15,7 +15,7 @@ class TranslationCacheManager
             $locales = ['en'];
         }
 
-        $groups = ['common', 'admin', 'client', 'auth', 'email', 'messages', 'validation', 'invoice', 'support', 'domain'];
+        $groups = ['common', 'admin', 'client', 'auth', 'email', 'messages', 'validation', 'invoice', 'support', 'domain', 'sections'];
 
         foreach ($locales as $locale) {
             foreach ($groups as $group) {
@@ -26,7 +26,7 @@ class TranslationCacheManager
 
     public static function flushLocale(string $locale): void
     {
-        $groups = ['common', 'admin', 'client', 'auth', 'email', 'messages', 'validation', 'invoice', 'support', 'domain'];
+        $groups = ['common', 'admin', 'client', 'auth', 'email', 'messages', 'validation', 'invoice', 'support', 'domain', 'sections'];
 
         foreach ($groups as $group) {
             Cache::forget("translations:{$locale}:{$group}");

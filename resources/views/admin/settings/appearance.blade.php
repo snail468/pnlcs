@@ -72,7 +72,7 @@
                     @csrf
                     <input type="file" name="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp" class="form-control" style="margin-bottom:8px;">
                     <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-upload"></i> {{ __('admin.appearance.upload_logo') }}</button>
-                    <span style="font-size:11px; color:#999; margin-left:6px;">PNG, JPG, SVG, WebP. Max 2MB.</span>
+                    <span style="font-size:11px; color:#999; margin-left:6px;">PNG, JPG, SVG, WebP. {{ __('admin.appearance.max_size') }}</span>
                 </form>
             </div>
         </div>
@@ -95,7 +95,7 @@
                     @csrf
                     <input type="file" name="favicon" accept="image/png,image/x-icon,image/svg+xml" class="form-control" style="margin-bottom:8px;">
                     <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-upload"></i> {{ __('admin.appearance.upload_favicon') }}</button>
-                    <span style="font-size:11px; color:#999; margin-left:6px;">PNG, ICO, SVG. Max 512KB.</span>
+                    <span style="font-size:11px; color:#999; margin-left:6px;">PNG, ICO, SVG. {{ __('admin.appearance.max_size_favicon') }}</span>
                 </form>
             </div>
         </div>
@@ -149,9 +149,9 @@
                                 <button type="submit" class="btn btn-sm btn-primary" style="width:100%;">
                                     <i class="fas fa-check"></i>{{ __('common.actions.activate') }}</button>
                             </form>
-                            <a href="{{ route('admin.settings.appearance.theme.download', $slug) }}" class="btn btn-sm btn-default" title="Download ZIP"><i class="fas fa-download"></i></a>
+                            <a href="{{ route('admin.settings.appearance.theme.download', $slug) }}" class="btn btn-sm btn-default" title="{{ __('common.actions.download') }} ZIP"><i class="fas fa-download"></i></a>
                             @if(!$themeInfo->isBuiltin)
-                            <form action="{{ route('admin.settings.appearance.theme.delete', $slug) }}" method="POST" onsubmit="return confirm('Delete theme {{ $themeInfo->name }}?');">
+                            <form action="{{ route('admin.settings.appearance.theme.delete', $slug) }}" method="POST" onsubmit="return confirm('{{ __('common.actions.delete') }} {{ $themeInfo->name }}?');">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                             </form>
@@ -201,7 +201,7 @@
                 @foreach($presets as $key => $preset)
                 <div style="border:2px solid {{ $activePreset === $key ? '#337ab7' : '#e5e7eb' }}; border-radius:8px; padding:20px; position:relative; transition:all 0.2s; {{ $activePreset === $key ? 'box-shadow:0 0 0 3px rgba(51,122,183,0.2);' : '' }}">
                     @if($activePreset === $key)
-                    <span style="position:absolute; top:8px; right:8px; background:#337ab7; color:#fff; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">ACTIVE</span>
+                    <span style="position:absolute; top:8px; right:8px; background:#337ab7; color:#fff; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:700;">{{ __('admin.appearance.active_badge') }}</span>
                     @endif
                     <h3 style="font-size:16px; font-weight:700; margin-bottom:4px;">{{ $preset['name'] }}</h3>
                     <p style="font-size:12px; color:#777; margin-bottom:14px;">{{ $preset['description'] }}</p>
@@ -298,7 +298,7 @@
                     <div style="border-radius:6px; overflow:hidden; border:1px solid #ddd;">
                         <div id="prev-hero" style="background:linear-gradient(135deg, {{ $activeColors['hero_bg_start'] }}, {{ $activeColors['hero_bg_mid'] }}, {{ $activeColors['hero_bg_end'] }}); padding:28px; text-align:center;">
                             <div style="color:#fff; font-size:18px; font-weight:800; margin-bottom:8px;">{{ __("admin.appearance.preview_your_website") }}</div>
-                            <div id="prev-cta" style="display:inline-block; padding:6px 18px; background:{{ $activeColors['welcome_accent'] }}; color:#fff; border-radius:6px; font-size:11px; font-weight:700;">Get Started</div>
+                            <div id="prev-cta" style="display:inline-block; padding:6px 18px; background:{{ $activeColors['welcome_accent'] }}; color:#fff; border-radius:6px; font-size:11px; font-weight:700;">{{ __('admin.appearance.preview_get_started') }}</div>
                         </div>
                         <div style="padding:12px; background:#fff;">
                             <div id="prev-table-header" style="background:{{ $activeColors['table_header_bg'] }}; color:#fff; padding:4px 10px; font-size:11px; font-weight:600; border-radius:3px;">{{ __("admin.appearance.preview_table_header") }}</div>
@@ -428,7 +428,7 @@
                 <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:16px;">
                     <p style="font-size:13px; font-weight:600; margin-bottom:8px;">{{ __('admin.appearance.how_it_works') }}</p>
                     <ul style="font-size:12px; color:#666; padding-left:20px; margin:0;">
-                        <li>A moon/sun icon toggle appears in the navigation bar</li>
+                        <li>{{ __('admin.appearance.darkmode_bullet_toggle') }}</li>
                         <li>{{ __("admin.appearance.darkmode_bullet_1") }}</li>
                         <li>{{ __("admin.appearance.darkmode_bullet_2") }}</li>
                         <li>{{ __("admin.appearance.darkmode_bullet_3") }}</li>

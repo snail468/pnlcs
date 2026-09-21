@@ -24,7 +24,7 @@
     <div class="card-body" style="padding:10px 15px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:8px;">
             <strong style="font-size:13px;">{{ __('admin.clients.status') }}:</strong>
-            <span class="badge-{{ strtolower($client->status->value) }}">{{ ucfirst($client->status->value) }}</span>
+            <span class="badge-{{ strtolower($client->status->value) }}">{{ __('common.status.'.strtolower($client->status->value)) }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <strong style="font-size:13px;">{{ __('admin.clients.credit_balance') }}:</strong>
@@ -32,7 +32,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <strong style="font-size:13px;">{{ __('admin.clients.tax_exempt') }}:</strong>
-            <span style="font-size:13px;">{{ $client->tax_exempt ? 'Yes' : 'No' }}</span>
+            <span style="font-size:13px;">{{ $client->tax_exempt ? __('common.status.yes') : __('common.status.no') }}</span>
         </div>
     </div>
 </div>
@@ -168,8 +168,8 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
             <div class="panel-heading panel-primary">{{ __('admin.clients.other_info') }}</div>
             <div class="panel-body">
                 <table style="width:100%;font-size:13px;border-collapse:collapse;">
-                    <tr><td style="padding:5px 0;color:#777;width:50%;">{{ __('admin.clients.status') }}</td><td style="padding:5px 0;"><span class="badge-{{ strtolower($client->status->value) }}">{{ ucfirst($client->status->value) }}</span></td></tr>
-                    <tr><td style="padding:5px 0;color:#777;">{{ __('admin.clients.tax_exempt') }}</td><td style="padding:5px 0;">{{ $client->tax_exempt ? 'Yes' : 'No' }}</td></tr>
+                    <tr><td style="padding:5px 0;color:#777;width:50%;">{{ __('admin.clients.status') }}</td><td style="padding:5px 0;"><span class="badge-{{ strtolower($client->status->value) }}">{{ __('common.status.'.strtolower($client->status->value)) }}</span></td></tr>
+                    <tr><td style="padding:5px 0;color:#777;">{{ __('admin.clients.tax_exempt') }}</td><td style="padding:5px 0;">{{ $client->tax_exempt ? __('common.status.yes') : __('common.status.no') }}</td></tr>
                     <tr><td style="padding:5px 0;color:#777;">{{ __('admin.clients.created') }}</td><td style="padding:5px 0;">{{ $client->created_at->format(date_fmt()) }}</td></tr>
                     <tr><td style="padding:5px 0;color:#777;">{{ __('admin.clients.last_login') }}</td><td style="padding:5px 0;">{{ $client->users->max('last_login')?->diffForHumans() ?? __('admin.clients.never') }}</td></tr>
                 </table>
@@ -197,7 +197,7 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
                         <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;">
-                            <input type="checkbox" name="sticky" value="1"> Sticky
+                            <input type="checkbox" name="sticky" value="1"> {{ __('admin.clients.sticky') }}
                         </label>
                         <button type="submit" class="btn btn-primary btn-sm">{{ __('admin.clients.add_note') }}</button>
                     </div>
@@ -273,11 +273,11 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
                 <div class="form-group">
                     <label class="form-label">{{ __('common.table.status') }} <span style="color:#d9534f;">*</span></label>
                     <select name="status" class="form-control" required>
-                        <option value="active" @selected(old('status','active')=='active')>Active</option>
-                        <option value="pending" @selected(old('status')=='pending')>Pending</option>
-                        <option value="suspended" @selected(old('status')=='suspended')>Suspended</option>
-                        <option value="cancelled" @selected(old('status')=='cancelled')>Cancelled</option>
-                        <option value="terminated" @selected(old('status')=='terminated')>Terminated</option>
+                        <option value="active" @selected(old('status','active')=='active')>{{ __('common.status.active') }}</option>
+                        <option value="pending" @selected(old('status')=='pending')>{{ __('common.status.pending') }}</option>
+                        <option value="suspended" @selected(old('status')=='suspended')>{{ __('common.status.suspended') }}</option>
+                        <option value="cancelled" @selected(old('status')=='cancelled')>{{ __('common.status.cancelled') }}</option>
+                        <option value="terminated" @selected(old('status')=='terminated')>{{ __('common.status.terminated') }}</option>
                     </select>
                 </div>
             </div>
@@ -343,7 +343,7 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
             <td>{{ $service->billing_cycle }}</td>
             <td>{{ money_fmt($service->amount) }}</td>
             <td>{{ $service->next_due_date?->format(date_fmt()) ?? '-' }}</td>
-            <td><span class="badge-{{ strtolower($service->status) }}">{{ ucfirst($service->status) }}</span></td>
+            <td><span class="badge-{{ strtolower($service->status) }}">{{ __('common.status.'.strtolower($service->status)) }}</span></td>
         </tr>
         @endforeach
         </tbody>
@@ -400,11 +400,11 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
                 <div class="form-group">
                     <label class="form-label">{{ __('common.table.status') }} <span style="color:#d9534f;">*</span></label>
                     <select name="status" class="form-control" required>
-                        <option value="active" @selected(old('status','active')=='active')>Active</option>
-                        <option value="grace" @selected(old('status')=='grace')>Grace</option>
-                        <option value="pending" @selected(old('status')=='pending')>Pending</option>
-                        <option value="expired" @selected(old('status')=='expired')>Expired</option>
-                        <option value="cancelled" @selected(old('status')=='cancelled')>Cancelled</option>
+                        <option value="active" @selected(old('status','active')=='active')>{{ __('common.status.active') }}</option>
+                        <option value="grace" @selected(old('status')=='grace')>{{ __('common.status.grace') }}</option>
+                        <option value="pending" @selected(old('status')=='pending')>{{ __('common.status.pending') }}</option>
+                        <option value="expired" @selected(old('status')=='expired')>{{ __('common.status.expired') }}</option>
+                        <option value="cancelled" @selected(old('status')=='cancelled')>{{ __('common.status.cancelled') }}</option>
                     </select>
                 </div>
             </div>
@@ -429,7 +429,7 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
             <td>{{ $domain->registrar ?? '-' }}</td>
             <td>{{ $domain->registration_date?->format(date_fmt()) ?? '-' }}</td>
             <td>{{ $domain->expiry_date?->format(date_fmt()) ?? '-' }}</td>
-            <td><span class="badge-{{ strtolower($domain->status) }}">{{ ucfirst($domain->status) }}</span></td>
+            <td><span class="badge-{{ strtolower($domain->status) }}">{{ __('common.status.'.strtolower($domain->status)) }}</span></td>
             <td style="text-align:right;">
                 <a href="{{ route('admin.domains.show', $domain) }}" class="btn btn-default btn-xs">{{ __('common.actions.view') }}</a>
             </td>
@@ -481,9 +481,9 @@ $tabs = ['summary'=>__('admin.clients.tab_summary'),'services'=>__('admin.client
             <td style="font-family:monospace;font-size:12px;">{{ $ticket->tid }}</td>
             <td>{{ $ticket->department->name ?? '-' }}</td>
             <td><a href="{{ route('admin.tickets.show', $ticket) }}" style="color:#337ab7;">{{ $ticket->title }}</a></td>
-            <td><span style="font-size:11px;">{{ ucfirst($ticket->priority) }}</span></td>
+            <td><span style="font-size:11px;">{{ __('common.priority.'.strtolower($ticket->priority)) }}</span></td>
             <td style="font-size:12px;">{{ $ticket->last_reply?->diffForHumans() ?? '-' }}</td>
-            <td><span class="badge-{{ strtolower($ticket->status) }}">{{ ucfirst($ticket->status) }}</span></td>
+            <td><span class="badge-{{ strtolower($ticket->status) }}">{{ __('common.status.'.strtolower($ticket->status)) }}</span></td>
         </tr>
         @endforeach
         </tbody>

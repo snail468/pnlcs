@@ -77,7 +77,7 @@
                             <option value="plesk">Plesk</option>
                             <option value="directadmin">DirectAdmin</option>
                             <option value="cyberpanel">CyberPanel</option>
-                            <option value="custom">Custom / Other</option>
+                            <option value="custom">{{ __('admin.servers.type_custom') }}</option>
                         </select>
                     </div>
                     <div class="form-group"><label class="form-label">{{ __('admin.servers.port') }}</label><input type="number" name="port" value="8443" class="form-control" data-role="port"></div>
@@ -129,13 +129,13 @@
                             <option value="plesk">Plesk</option>
                             <option value="directadmin">DirectAdmin</option>
                             <option value="cyberpanel">CyberPanel</option>
-                            <option value="custom">Custom / Other</option>
+                            <option value="custom">{{ __('admin.servers.type_custom') }}</option>
                         </select>
                     </div>
                     <div class="form-group"><label class="form-label">{{ __('admin.servers.port') }}</label><input type="number" id="edit-port" name="port" class="form-control"></div>
                     <div class="form-group" data-role="edit-username-group"><label class="form-label">{{ __('common.form.username') }}</label><input type="text" id="edit-username" name="username" class="form-control"></div>
-                    <div class="form-group"><label class="form-label" data-role="edit-password-label">{{ __('common.form.new_password') }}<small style="color:#999;">(leave blank to keep)</small></label><input type="password" name="password" class="form-control" placeholder="Leave blank to keep unchanged"></div>
-                    <div class="form-group" data-role="edit-hash-group"><label class="form-label" data-role="edit-hash-label">{{ __('admin.servers.access_hash') }}</label><textarea name="access_hash" rows="2" class="form-control" placeholder="Leave blank to keep unchanged"></textarea></div>
+                    <div class="form-group"><label class="form-label" data-role="edit-password-label">{{ __('common.form.new_password') }} <small style="color:#999;">({{ __('admin.servers.leave_blank_keep') }})</small></label><input type="password" name="password" class="form-control" placeholder="{{ __('admin.servers.leave_blank_keep') }}"></div>
+                    <div class="form-group" data-role="edit-hash-group"><label class="form-label" data-role="edit-hash-label">{{ __('admin.servers.access_hash') }}</label><textarea name="access_hash" rows="2" class="form-control" placeholder="{{ __('admin.servers.leave_blank_keep') }}"></textarea></div>
                     <div class="form-group"><label class="form-label">{{ __('admin.servers.max_accounts') }}</label><input type="number" id="edit-max-accounts" name="max_accounts" min="0" class="form-control"></div>
                 </div>
                 <div style="margin-top:15px;padding-top:15px;border-top:1px solid #eee;">
@@ -168,33 +168,42 @@ var serverRouteBase = "{{ url('admin/config/servers') }}";
 // Hash as the API Secret (sk_live_...) - see modules/Servers/Panelica. The
 // generic form put seven fields in front of someone holding exactly those two
 // strings, and nothing said which went where.
+@php $isZh = app()->getLocale() === 'zh'; @endphp
 const SERVER_TYPE_TUNING = {
     panelica: {
         port: 8443, username: false,
-        passwordLabel: 'API Key', passwordPlaceholder: 'pk_live_...',
-        hashLabel: 'API Secret', hashPlaceholder: 'sk_live_...',
-        hint: '<strong>Panelica:</strong> in the Panelica panel open <em>Settings → API Keys</em> and create a key. Paste the <strong>API Key</strong> (pk_live_…) and the <strong>API Secret</strong> (sk_live_…) below — the secret is shown only once over there. Username is not used; the port is the panel port (8443).',
+        passwordLabel: '{{ $isZh ? "API 密钥 (API Key)" : "API Key" }}', passwordPlaceholder: 'pk_live_...',
+        hashLabel: '{{ $isZh ? "API 密钥机密 (API Secret)" : "API Secret" }}', hashPlaceholder: 'sk_live_...',
+        hint: {!! json_encode($isZh
+            ? '<strong>Panelica:</strong> 在 Panelica 管理面板中打开 <em>设置 → API 密钥 (Settings → API Keys)</em> 并新建一组密钥。将 <strong>API Key</strong> (pk_live_…) 和 <strong>API Secret</strong> (sk_live_…) 分别粘贴在下方 — 机密仅在面板创建时展示一次。用户名无需填写；默认管理端口为 8443。'
+            : '<strong>Panelica:</strong> in the Panelica panel open <em>Settings → API Keys</em> and create a key. Paste the <strong>API Key</strong> (pk_live_…) and the <strong>API Secret</strong> (sk_live_…) below — the secret is shown only once over there. Username is not used; the port is the panel port (8443).') !!},
     },
     cpanel: {
         port: 2087, username: true,
         passwordLabel: 'API Token', passwordPlaceholder: 'WHM → Development → Manage API Tokens',
-        hashLabel: 'Access Hash (legacy)', hashPlaceholder: 'Only for old servers without API tokens',
-        hint: '<strong>cPanel/WHM:</strong> username is the WHM account (usually <code>root</code>); create the token under <em>WHM → Development → Manage API Tokens</em> and paste it as the API Token. Port 2087.',
+        hashLabel: '{{ $isZh ? "Access Hash (旧版服务器)" : "Access Hash (legacy)" }}', hashPlaceholder: '{{ $isZh ? "仅用于不支持 API Token 的旧版 WHM" : "Only for old servers without API tokens" }}',
+        hint: {!! json_encode($isZh
+            ? '<strong>cPanel/WHM:</strong> 用户名为 WHM 管理账户（通常为 <code>root</code>）；在 <em>WHM → 开发 (Development) → 管理 API 令牌 (Manage API Tokens)</em> 中生成并填入下方。默认管理端口 2087。'
+            : '<strong>cPanel/WHM:</strong> username is the WHM account (usually <code>root</code>); create the token under <em>WHM → Development → Manage API Tokens</em> and paste it as the API Token. Port 2087.') !!},
     },
     plesk: {
         port: 8443, username: true,
-        passwordLabel: 'Password / API Key', passwordPlaceholder: 'Plesk admin password or API key',
-        hashLabel: 'Access Hash', hashPlaceholder: 'Not used by Plesk',
-        hint: '<strong>Plesk:</strong> username is the Plesk administrator (usually <code>admin</code>) with their password, on port 8443.',
+        passwordLabel: '{{ $isZh ? "管理员密码 / API 密钥" : "Password / API Key" }}', passwordPlaceholder: '{{ $isZh ? "Plesk 管理员密码或 API 密钥" : "Plesk admin password or API key" }}',
+        hashLabel: 'Access Hash', hashPlaceholder: '{{ $isZh ? "Plesk 无需填写" : "Not used by Plesk" }}',
+        hint: {!! json_encode($isZh
+            ? '<strong>Plesk:</strong> 用户名为 Plesk 管理员（通常为 <code>admin</code>）及其密码，默认管理端口 8443。'
+            : '<strong>Plesk:</strong> username is the Plesk administrator (usually <code>admin</code>) with their password, on port 8443.') !!},
     },
     directadmin: {
         port: 2222, username: true,
-        passwordLabel: 'Password / Login Key', passwordPlaceholder: 'DirectAdmin password or login key',
-        hashLabel: 'Access Hash', hashPlaceholder: 'Not used by DirectAdmin',
-        hint: '<strong>DirectAdmin:</strong> username is the admin account with its password or a login key, on port 2222.',
+        passwordLabel: '{{ $isZh ? "管理员密码 / 登录密钥" : "Password / Login Key" }}', passwordPlaceholder: '{{ $isZh ? "DirectAdmin 管理员密码或登录密钥" : "DirectAdmin password or login key" }}',
+        hashLabel: 'Access Hash', hashPlaceholder: '{{ $isZh ? "DirectAdmin 无需填写" : "Not used by DirectAdmin" }}',
+        hint: {!! json_encode($isZh
+            ? '<strong>DirectAdmin:</strong> 用户名为 admin 管理员账户及其密码或登录密钥，默认管理端口 2222。'
+            : '<strong>DirectAdmin:</strong> username is the admin account with its password or a login key, on port 2222.') !!},
     },
-    cyberpanel: { port: 8090, username: true, passwordLabel: 'Password', passwordPlaceholder: '', hashLabel: 'Access Hash', hashPlaceholder: '', hint: '' },
-    custom: { port: 8443, username: true, passwordLabel: 'Password / API Token', passwordPlaceholder: '', hashLabel: 'Access Hash / API Key', hashPlaceholder: '', hint: '' },
+    cyberpanel: { port: 8090, username: true, passwordLabel: '{{ $isZh ? "密码" : "Password" }}', passwordPlaceholder: '', hashLabel: 'Access Hash', hashPlaceholder: '', hint: '' },
+    custom: { port: 8443, username: true, passwordLabel: '{{ $isZh ? "密码 / API 令牌" : "Password / API Token" }}', passwordPlaceholder: '', hashLabel: '{{ $isZh ? "Access Hash / API 密钥" : "Access Hash / API Key" }}', hashPlaceholder: '', hint: '' },
 };
 
 function serverTypeTuning(selectEl, prefix) {

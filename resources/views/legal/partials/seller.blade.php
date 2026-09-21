@@ -18,33 +18,43 @@
         'name' => '', 'legal_name' => '', 'address' => '', 'city' => '', 'state' => '',
         'postcode' => '', 'country' => '', 'phone' => '', 'email' => '', 'website' => '',
         'tax_office' => '', 'tax_id' => '', 'mersis' => '', 'trade_registry' => '',
-    ], $company);
+    ], $company ?? []);
+
+    $isZh = ($legalLocale ?? app()->getLocale()) === 'zh';
+    $isTr = ($legalLocale ?? app()->getLocale()) === 'tr';
+
+    $lbl = function($zh, $trText, $en) use ($isZh, $isTr) {
+        if ($isZh) return $zh;
+        if ($isTr) return $trText;
+        return $en;
+    };
 
     $mandatory = [
-        ($tr ? 'Unvan'                    : 'Registered name')  => $company['legal_name'] ?: $company['name'],
-        ($tr ? 'Marka / işletme adı'      : 'Trading as')       => ($company['legal_name'] && $company['legal_name'] !== $company['name']) ? $company['name'] : '',
-        ($tr ? 'Adres'                    : 'Address')          => trim(implode(', ', array_filter([
-                                                                       $company['address'], $company['postcode'],
-                                                                       $company['city'], $company['state'], $company['country'],
-                                                                   ]))),
-        ($tr ? 'Telefon'                  : 'Telephone')        => $company['phone'],
-        ($tr ? 'E-posta'                  : 'Email')            => $company['email'],
-        ($tr ? 'İnternet adresi'          : 'Website')          => $company['website'],
-        ($tr ? 'Vergi dairesi'            : 'Tax office')       => $company['tax_office'],
-        ($tr ? 'Vergi numarası'           : 'Tax number')       => $company['tax_id'],
+        $lbl('企业/注册名称', 'Unvan', 'Registered name')            => $company['legal_name'] ?: $company['name'],
+        $lbl('商号 / 经营字号', 'Marka / işletme adı', 'Trading as')  => ($company['legal_name'] && $company['legal_name'] !== $company['name']) ? $company['name'] : '',
+        $lbl('经营地址', 'Adres', 'Address')                         => trim(implode(', ', array_filter([
+                                                                           $company['address'], $company['postcode'],
+                                                                           $company['city'], $company['state'], $company['country'],
+                                                                       ]))),
+        $lbl('联系电话', 'Telefon', 'Telephone')                     => $company['phone'],
+        $lbl('电子邮箱', 'E-posta', 'Email')                         => $company['email'],
+        $lbl('官方网站', 'İnternet adresi', 'Website')               => $company['website'],
+        $lbl('税务登记机关', 'Vergi dairesi', 'Tax office')           => $company['tax_office'],
+        $lbl('统一税号 / 识别号', 'Vergi numarası', 'Tax number')      => $company['tax_id'],
     ];
 
     // Shown only when set: not every company has these, and an empty row
     // invites the question "why is that blank?" where none is warranted.
     $optional = [
-        ($tr ? 'MERSİS numarası'          : 'MERSIS number')    => $company['mersis'],
-        ($tr ? 'Ticaret sicil numarası'   : 'Trade registry no') => $company['trade_registry'],
+        $lbl('MERSİS 商业系统编号', 'MERSİS numarası', 'MERSIS number') => $company['mersis'],
+        $lbl('商业登记编号', 'Ticaret sicil numarası', 'Trade registry no') => $company['trade_registry'],
     ];
 
+    $tradeKey = $lbl('商号 / 经营字号', 'Marka / işletme adı', 'Trading as');
     $rows = $mandatory;
     // "Marka" only earns a row when the brand and the registered name differ.
-    if ($rows[$tr ? 'Marka / işletme adı' : 'Trading as'] === '') {
-        unset($rows[$tr ? 'Marka / işletme adı' : 'Trading as']);
+    if ($rows[$tradeKey] === '') {
+        unset($rows[$tradeKey]);
     }
     foreach ($optional as $label => $value) {
         if (trim((string) $value) !== '') {
